@@ -15,7 +15,7 @@ export default class VRRenderingContext extends RenderingContext {
 
         if (THREE.WEBVR.isAvailable() === true) {
         //document.body.appendChild( WEBVR.getButton( effect ) );
-            setTimeout(function() {
+            setTimeout(() => {
                 this.effect.requestPresent();
             }, 500);
         }
