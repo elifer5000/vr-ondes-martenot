@@ -31,11 +31,11 @@ export default class MainView {
         this.renderingContext.onRender();
     }
 
-    onWindowResize(){
-        this.camera.aspect = window.innerWidth / window.innerHeight;
-        this.camera.updateProjectionMatrix();
+    onWindowResize() {
+        this.renderingContext.camera.aspect = window.innerWidth / window.innerHeight;
+        this.renderingContext.camera.updateProjectionMatrix();
 
-        this.renderingContext.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderingContext.setSize(window.innerWidth, window.innerHeight);
     }
 
     get scene() {

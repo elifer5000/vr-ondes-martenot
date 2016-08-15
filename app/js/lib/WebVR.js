@@ -3,7 +3,7 @@
  * Based on @tojiro's vr-samples-utils.js
  */
 
-var WEBVR = {
+THREE.WEBVR = {
 
 	isLatestAvailable: function () {
 

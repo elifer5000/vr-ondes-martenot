@@ -1,4 +1,4 @@
-import '../../bin/FlyControls';
+import '../../../node_modules/three/examples/js/controls/FlyControls';
 import RenderingContext from './RenderingContext';
 import VirtualVRController from './VirtualVRController';
 
@@ -26,6 +26,10 @@ export default class StandardRenderingContext extends RenderingContext {
         const delta = this.clock.getDelta();
         this.controls.update(delta);
         this.renderer.render(this.scene, this.camera);
+    }
+
+    setSize(width, height) {
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
     addControllers() {
