@@ -1,7 +1,9 @@
 import MainView from './view/MainView';
+import AudioController from './AudioController';
 
 export default class Controller {
     constructor(renderingContextFactory) {
+        this.audio = new AudioController(2, 1.6);
         this.view = new MainView(this, renderingContextFactory);
         this.view.initialize();
         this.objects = [];
@@ -25,17 +27,27 @@ export default class Controller {
             this.view.scene.add(object);
             this.objects.push(object);
         }
+
+        this.audio.onStart(0, 0);
     }
 
-    onControllerMoved(vrController) {
-        for (const object of this.objects) {
-            if (!object.bbox) {
-                object.bbox = new THREE.Box3().setFromObject(object);
-            }
+    onControllerMoved(vrController, index) {
+        // for (const object of this.objects) {
+        //     if (!object.bbox) {
+        //         object.bbox = new THREE.Box3().setFromObject(object);
+        //     }
+        //
+        //     if (object.bbox.containsPoint(vrController.position)) {
+        //         this.view.scene.remove(object);
+        //     }
+        // }
 
-            if (object.bbox.containsPoint(vrController.position)) {
-                this.view.scene.remove(object);
-            }
+        console.log(vrController);
+
+        // if (this.audio)
+        if (index === 0) {
+            const pos = vrController.realPosition;
+            this.audio.onChange(pos.x, pos.y < 0 ? 0 : pos.y);
         }
     }
 

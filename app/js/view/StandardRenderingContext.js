@@ -16,6 +16,7 @@ export default class StandardRenderingContext extends RenderingContext {
         this.addControllers();
 
         this.controls.onPositionChange = () => {
+            console.log('fly control changed');
             for (const controller of this.controllers) {
                 controller.resetPosition();
             }
@@ -26,6 +27,9 @@ export default class StandardRenderingContext extends RenderingContext {
         const delta = this.clock.getDelta();
         this.controls.update(delta);
         this.renderer.render(this.scene, this.camera);
+        for (let i = 0; i < this.controllers.length; i++) {
+            this.emit('onControllerPositionChange', { controller: this.controllers[i], index: i });
+        }
     }
 
     setSize(width, height) {
@@ -38,11 +42,11 @@ export default class StandardRenderingContext extends RenderingContext {
             new VirtualVRController(new THREE.Vector3(-0.3, 0, -1), this)
         ];
 
-        for (const controller of this.controllers) {
-            controller.addObserver( 'onPositionChange', (e) => {
-                this.emit('onControllerPositionChange', { controller });
-            });
-        }
+        // for (const controller of this.controllers) {
+        //     controller.addObserver( 'onPositionChange', (e) => {
+        //         this.emit('onControllerPositionChange', { controller });
+        //     });
+        // }
     }
 
     getController(index) {

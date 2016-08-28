@@ -2,7 +2,7 @@ import '../../../node_modules/three/examples/js/controls/TransformControls';
 import Observable from '../Observable';
 
 export default class VirtualVRController extends Observable {
-    constructor(cameraOffset,renderingContext) {
+    constructor(cameraOffset, renderingContext) {
         super();
         this.cameraOffset = cameraOffset;
         this.renderingContext = renderingContext;
@@ -28,6 +28,7 @@ export default class VirtualVRController extends Observable {
     }
 
     resetPosition() {
+        console.log('reset posi');
         const pLocal = this.cameraOffset.clone();
         const pWorld = pLocal.applyMatrix4( this.renderingContext.camera.matrixWorld );
         const dir = pWorld.sub(this.renderingContext.camera.position).normalize();
@@ -36,6 +37,10 @@ export default class VirtualVRController extends Observable {
         this.mesh.position.add(dir.multiplyScalar(2));
         this.control.update();
         this.emit('onPositionChange');
+    }
+
+    get realPosition() {
+        return this.position;
     }
 
     get position() {

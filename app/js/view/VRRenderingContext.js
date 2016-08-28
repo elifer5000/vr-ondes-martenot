@@ -24,6 +24,13 @@ export default class VRRenderingContext extends RenderingContext {
 
     onRender() {
         this.controls.update();
+        for (let i = 0; i < this.controllers.length; i++) {
+            const controlPos = this.controllers[i].position.clone();
+            controlPos.applyMatrix4(this.controllers[i].standingMatrix);
+            this.controllers[i].realPosition = controlPos;
+            this.emit('onControllerPositionChange', { controller: this.controllers[i], index: i });
+        }
+
         this.effect.render(this.scene, this.camera);
     }
 
@@ -50,10 +57,6 @@ export default class VRRenderingContext extends RenderingContext {
                 controller.add(object.clone());
                 controller.standingMatrix = this.controls.getStandingMatrix();
                 this.scene.add(controller);
-
-                controller.addEventListener( 'onPositionChange', (e) => {
-                    this.emit('onControllerPositionChange', { controller });
-                });
             }
         });
     }
