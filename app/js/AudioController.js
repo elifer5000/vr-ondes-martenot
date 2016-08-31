@@ -10,7 +10,7 @@ var calculateGain = function(position, height) {
     var maxG = 1;
 
     var gain = (position / height) * (maxG - minG) + minG;
-    console.log(gain);
+    // console.log(gain);
     return gain;
 };
 

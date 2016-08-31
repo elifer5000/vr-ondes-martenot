@@ -42,7 +42,7 @@ export default class Controller {
         //     }
         // }
 
-        console.log(vrController);
+        // console.log(vrController);
 
         // if (this.audio)
         if (index === 0) {
