@@ -11,7 +11,7 @@ export default class RenderingContext extends Observable {
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(45, width / height, 0.01, 1000);
 
-        this.renderer = new THREE.WebGLRenderer();
+        this.renderer = new THREE.WebGLRenderer( { antialias: true });
         this.renderer.setSize(width, height);
         this.renderer.setClearColor(0xf0f0f0, 1);
 

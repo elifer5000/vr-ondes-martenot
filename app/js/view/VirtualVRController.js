@@ -28,7 +28,6 @@ export default class VirtualVRController extends Observable {
     }
 
     resetPosition() {
-        console.log('reset posi');
         const pLocal = this.cameraOffset.clone();
         const pWorld = pLocal.applyMatrix4( this.renderingContext.camera.matrixWorld );
         const dir = pWorld.sub(this.renderingContext.camera.position).normalize();

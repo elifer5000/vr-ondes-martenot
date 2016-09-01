@@ -13,14 +13,9 @@ export default class StandardRenderingContext extends RenderingContext {
         this.controls.autoForward = false;
         this.controls.dragToLook = true;
 
-        this.addControllers();
+        this.camera.position.set(0, 1.1, 0);
 
-        this.controls.onPositionChange = () => {
-            console.log('fly control changed');
-            for (const controller of this.controllers) {
-                controller.resetPosition();
-            }
-        };
+        this.addControllers();
     }
 
     onRender() {
@@ -41,12 +36,6 @@ export default class StandardRenderingContext extends RenderingContext {
             new VirtualVRController(new THREE.Vector3(0.3, 0, -1), this),
             new VirtualVRController(new THREE.Vector3(-0.3, 0, -1), this)
         ];
-
-        // for (const controller of this.controllers) {
-        //     controller.addObserver( 'onPositionChange', (e) => {
-        //         this.emit('onControllerPositionChange', { controller });
-        //     });
-        // }
     }
 
     getController(index) {
