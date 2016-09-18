@@ -18,13 +18,20 @@ export default class StandardRenderingContext extends RenderingContext {
         this.addControllers();
     }
 
+    getHeadsetPosition() {
+        return this.camera.position;
+    }
+
+    getHeadsetRotation() {
+        return this.camera.rotation;
+    }
+
     onRender() {
         const delta = this.clock.getDelta();
         this.controls.update(delta);
         this.renderer.render(this.scene, this.camera);
-        for (let i = 0; i < this.controllers.length; i++) {
-            this.emit('onControllerPositionChange', { controller: this.controllers[i], index: i });
-        }
+        const head = { position: this.getHeadsetPosition(), rotation: this.getHeadsetRotation() };
+        this.emit('onControllerPositionChange', { controllers: this.controllers, head: head });
     }
 
     setSize(width, height) {

@@ -15,12 +15,24 @@ export default class RenderingContext extends Observable {
         this.renderer.setSize(width, height);
         this.renderer.setClearColor(0xf0f0f0, 1);
 
-        const light = new THREE.DirectionalLight(0xffffff, 1);
+        const light = new THREE.SpotLight( 0xffffff );
+        light.position.set( 10, 10, 20 );
+        light.target.position.set(0, 0, 0);
+        this.scene.add( light );
+        const light2 = new THREE.SpotLight( 0xffffff );
+        light2.position.set( -10, 10, -20 );
+        light2.target.position.set(0, 0, 0);
+        this.scene.add( light2 );
 
-        light.position.set(15,15,15);
-        this.scene.add(light);
+        this.scene.add(new THREE.HemisphereLight( 0xffffff, 0x00ff00, 0.6 ));
+    }
 
-        this.scene.add(new THREE.AmbientLight(0xffffff));
+    getHeadsetPosition() {
+        return this.camera.position;
+    }
+
+    getHeadsetRotation() {
+        return this.camera.rotation;
     }
 
     getDomElement() {

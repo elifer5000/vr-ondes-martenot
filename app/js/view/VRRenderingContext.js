@@ -14,7 +14,7 @@ export default class VRRenderingContext extends RenderingContext {
         this.effect = new THREE.VREffect( this.renderer );
 
         if (THREE.WEBVR.isAvailable() === true) {
-        //document.body.appendChild( WEBVR.getButton( effect ) );
+            document.body.appendChild( THREE.WEBVR.getButton( this.effect ) );
             setTimeout(() => {
                 this.effect.requestPresent();
             }, 500);
@@ -24,13 +24,15 @@ export default class VRRenderingContext extends RenderingContext {
 
     onRender() {
         this.controls.update();
+        const head = { position: this.getHeadsetPosition(), rotation: this.getHeadsetRotation() };
         for (let i = 0; i < this.controllers.length; i++) {
+            this.controllers[i].update();
             const controlPos = this.controllers[i].position.clone();
             controlPos.applyMatrix4(this.controllers[i].standingMatrix);
             this.controllers[i].realPosition = controlPos;
-            this.emit('onControllerPositionChange', { controller: this.controllers[i], index: i });
         }
-
+        this.emit('onControllerPositionChange', { controllers: this.controllers, head: head });
+        
         this.effect.render(this.scene, this.camera);
     }
 

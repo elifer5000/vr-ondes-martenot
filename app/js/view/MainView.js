@@ -20,7 +20,7 @@ export default class MainView {
         window.addEventListener( 'resize', (e) => this.onWindowResize(), false );
         this.renderingContext.addObserver( 'onControllerPositionChange', (e) => {
             
-            this.controller.onControllerMoved(e.controller, e.index);
+            this.controller.onControllerMoved(e.controllers, e.head);
         });
 
         this.render();

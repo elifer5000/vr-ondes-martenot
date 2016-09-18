@@ -45,4 +45,12 @@ export default class VirtualVRController extends Observable {
     get position() {
         return this.mesh.position;
     }
+
+    getButtonState(button) {
+        return true;
+    }
+
+    getGamepad() {
+        return null;
+    }
 }
