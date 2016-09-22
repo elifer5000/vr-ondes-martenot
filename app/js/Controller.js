@@ -6,11 +6,12 @@ export default class Controller {
         this.audioW = 0.8;
         this.audioH = 1.6;
         this.audio = [];
-        this.audio.push(new AudioController(this.audioW, this.audioH));
-        this.audio.push(new AudioController(this.audioW, this.audioH));
+        const keysLocation = new THREE.Vector3(0.4, 0.5, -2);
+        const keysOrientation = 0;
+        this.audio.push(new AudioController(this.audioW, this.audioH, keysLocation, keysOrientation));
+        this.audio.push(new AudioController(this.audioW, this.audioH, keysLocation, keysOrientation));
         this.view = new MainView(this, renderingContextFactory);
         this.view.initialize();
-        this.objects = [];
         this.initialize();
     }
 
@@ -22,23 +23,44 @@ export default class Controller {
         room.position.y = 3;
         this.view.scene.add( room );
 
+        this.addKeysToScene();
+
+        this.highlightColor = new THREE.Color(0xFFFF00);
+    }
+
+    // TODO add a parent object that contains the keyboard's location and orientation
+    // could probably use full orientation and transform the control's coordiante system
+    // to they keyboards local one
+    addKeysToScene() {
         this.notes = this.audio[0].getNotesWithPosition();
-        console.log(this.notes);
+        // console.log(this.notes);
         for (const n in this.notes) {
             const isSharp = n.includes('#');
-            const x = this.notes[n].position;
+            const pos = this.notes[n].position;
             const color = isSharp ? 0x301280 : 0x00FF40;
             const noteMesh = new THREE.Mesh(
                 new THREE.BoxGeometry(isSharp ? 0.003 : 0.0075, 0.01, 0.2),
                 new THREE.MeshStandardMaterial( { color: color, wireframe: false } )
             );
-            noteMesh.position.set(x, 1.1, -1);
+            noteMesh.position.copy(pos);
+            noteMesh.rotation.y = this.audio[0].orientation;
             this.view.scene.add( noteMesh );
             this.notes[n].mesh = noteMesh;
             this.notes[n].origColor = new THREE.Color(color);
         }
+    }
 
-        this.highlightColor = new THREE.Color(0xFFFF00);
+    moveKeys(pos, orientation) {
+        for (let i = 0; i < this.audio.length; i++) {
+            this.audio[i].position.copy(pos);
+            this.audio[i].orientation = orientation;
+        }
+
+        for (const n in this.notes) {
+            this.view.scene.remove(this.notes[n].mesh);
+        }
+
+        this.addKeysToScene();
     }
 
     resetHighlights() {
@@ -51,15 +73,18 @@ export default class Controller {
     changeAudioFromController(vrController, audio) {
         const pos = vrController.realPosition;
            
-        let gain = pos.y;
+        let gain = 0.5; //Math.max(pos.y - this.keysLocation.y, 0);
         const gamepad = vrController.getGamepad();
         if (gamepad) {
-            gain = this.audioH * gamepad.buttons[1].value;
+            gain = this.audioH * Math.log2(1 + gamepad.buttons[1].value);
         }
-        audio.onChange(pos.x, gain);
+        audio.onChange(pos, gain);
         for (const n in this.notes) {
             const note = this.notes[n];
-            if (Math.abs(pos.x - note.position) < 0.005) {
+
+            const posXRotatedToKeys = audio.normalizePosition(pos.clone().sub(audio.position));
+            const noteRotated = audio.normalizePosition(note.position.clone().sub(audio.position));
+            if (Math.abs(posXRotatedToKeys - noteRotated) < 0.005) {
                 note.mesh.material.color = this.highlightColor;
                 //if (gamepad) {
                 //    gamepad.haptics[0].vibrate(0.05, 25);
@@ -68,9 +93,14 @@ export default class Controller {
         }
     }
 
+
+
     onControllerMoved(controllers, head) {
         this.resetHighlights();
         for (let i = 0; i < controllers.length; i++) {
+            if (controllers[i].getButtonState('grips')) {
+                this.moveKeys(controllers[i].realPosition, Math.PI);
+            }
             this.changeAudioFromController(controllers[i], this.audio[i]);
         }
     }

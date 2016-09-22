@@ -47,6 +47,8 @@ export default class VirtualVRController extends Observable {
     }
 
     getButtonState(button) {
+        if (button === 'grips') return false;
+
         return true;
     }
 
