@@ -24,7 +24,37 @@ export default class VirtualVRController extends Observable {
             this.emit('onPositionChange');
         });
 
+        this.thumbpadIsPressed = false;
+        this.triggerIsPressed = false;
+        this.gripsArePressed = false;
+        this.menuIsPressed = false;
+
+        window.addEventListener('keydown', (e) => this.onKeydown(e));
+        window.addEventListener('keyup', (e) => this.onKeyup(e));
+
         this.resetPosition();
+    }
+
+    onKeydown(e) {
+        switch (e.keyCode) {
+            case 32: // space
+                this.gripsArePressed = true;
+                break;
+            case 49: // 1
+                this.control.setMode('translate');
+                break;
+            case 50: // 2
+                this.control.setMode('rotate');
+                break;
+        }
+    }
+
+    onKeyup(e) {
+        switch (e.keyCode) {
+            case 32: // space
+                this.gripsArePressed = false;
+                break;
+        }
     }
 
     resetPosition() {
@@ -46,10 +76,14 @@ export default class VirtualVRController extends Observable {
         return this.mesh.position;
     }
 
-    getButtonState(button) {
-        if (button === 'grips') return false;
+    get rotation() {
+        return this.mesh.rotation;
+    }
 
-        return true;
+    getButtonState(button) {
+        if (button === 'grips') return this.gripsArePressed;
+        if (button === 'trigger') return this.triggerIsPressed;
+
     }
 
     getGamepad() {

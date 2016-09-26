@@ -52,7 +52,7 @@ function mapNotesToFrequency() {
 
     var notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     var octaveStart = 3;
-    var octaveEnd = 5;
+    var octaveEnd = 6;
 
     var notesFreqMap = {};
     for (var oct = octaveStart; oct <= octaveEnd; oct++) {
@@ -67,11 +67,8 @@ function mapNotesToFrequency() {
 }
 
 export default class AudioController {
-    constructor(width, height, position, orientation) {
+    constructor(width) {
         this.width = width;
-        this.height = height;
-        this.position = position;
-        this.orientation = orientation;
 
         this.notesToFreq = mapNotesToFrequency();
         this.context = new AudioContext();
@@ -114,11 +111,6 @@ export default class AudioController {
 
     }
 
-
-    normalizePosition(pos) {
-        return -pos.z * Math.sin(this.orientation) + pos.x * Math.cos(this.orientation);
-    }
-
     initBufferLoader() {
         const bufferLoader = new BufferLoader(this.context,
             [  //List of preloaded impulse files
@@ -137,23 +129,23 @@ export default class AudioController {
 
     onChange(pos, gain) {
         if (this.oscillator) {
-            this.oscillator.frequency.value = this._calculateFrequency(this.normalizePosition(pos.clone().sub(this.position)) + this.width/2);
-            this.gainNode.gain.value = this._calculateGain(gain);
+            if (pos !== null) {
+                this.oscillator.frequency.value = this._calculateFrequency(pos + this.width / 2);
+            }
+            if (gain !== null) {
+                this.gainNode.gain.value = this._calculateGain(gain);
+            }
         }
     }
 
     getNotesWithPosition() {
         var minNote = 3*12; // ~C3
-        var maxNote = 5*12 + 11; // ~B5
+        var maxNote = 6*12 + 11; // ~B6
 
         for (var note in this.notesToFreq) {
             if (this.notesToFreq.hasOwnProperty(note)) {
                 const pos = new THREE.Vector3();
-                pos.copy(this.position);
-
-                const location = this.width * (this.notesToFreq[note].step - minNote) / (maxNote - minNote) - this.width/2;
-                pos.x += location * Math.cos(this.orientation);
-                pos.z -= location * Math.sin(this.orientation);
+                pos.x = this.width * (this.notesToFreq[note].step - minNote) / (maxNote - minNote) - this.width/2;
 
                 this.notesToFreq[note].position = pos;
             }
@@ -168,7 +160,7 @@ export default class AudioController {
         var baseOctave = 4;
 
         var minNote = 3*12; // ~C3
-        var maxNote = 5*12 + 11; // ~B5
+        var maxNote = 6*12 + 11; // ~B6
 
         var note = (val / this.width) * (maxNote - minNote) + minNote;
         if (note > maxNote || note < minNote) return 0;
@@ -179,11 +171,10 @@ export default class AudioController {
     }
 
     _calculateGain(val) {
-        // console.log(position, height);
         var minG = 0;
         var maxG = 1;
 
-        var gain = (val / this.height) * (maxG - minG) + minG;
+        var gain = val * (maxG - minG) + minG;
          // console.log(gain);
         return gain;
     }
