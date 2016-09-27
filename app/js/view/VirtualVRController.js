@@ -72,6 +72,10 @@ export default class VirtualVRController extends Observable {
         return this.position;
     }
 
+    get realRotation() {
+        return this.rotation;
+    }
+
     get position() {
         return this.mesh.position;
     }

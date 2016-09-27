@@ -3,15 +3,15 @@ import AudioController from './AudioController';
 
 export default class Controller {
     constructor(renderingContextFactory) {
-        const keyboardWidth = 1.0;
+        this.keyboardWidth = 1.0;
         this.keyWidth = 0.0075;
         this.keySharpWidth = 0.003;
         this.keyHeight = 0.01;
         this.keyLength = 0.2;
 
         this.audio = [];
-        this.audio.push(new AudioController(keyboardWidth));
-        this.audio.push(new AudioController(keyboardWidth));
+        this.audio.push(new AudioController(this.keyboardWidth));
+        this.audio.push(new AudioController(this.keyboardWidth));
         this.view = new MainView(this, renderingContextFactory);
         this.view.initialize();
         this.initialize();
@@ -37,11 +37,16 @@ export default class Controller {
     addKeysToScene() {
         this.notes = this.audio[0].getNotesWithPosition();
         this.rootObject = new THREE.Object3D();
+        const baseMesh = new THREE.Mesh(new THREE.BoxGeometry(1.05*this.keyboardWidth, 1.05*this.keyHeight, 1.2*this.keyLength),
+                                        new THREE.MeshStandardMaterial( { color: 0x838380 }));
+
+        baseMesh.position.y -= 1.05*this.keyHeight / 2;
+        this.rootObject.add(baseMesh);
         // console.log(this.notes);
         for (const n in this.notes) {
             const isSharp = n.includes('#');
             const pos = this.notes[n].position;
-            const color = isSharp ? 0x301280 : 0x00FF40;
+            const color = isSharp ? 0x353535 : 0xfffff0;
             const noteMesh = new THREE.Mesh(
                 this.createKeyGeometry(isSharp),
                 new THREE.MeshStandardMaterial( { color: color, wireframe: false } )
@@ -82,12 +87,19 @@ export default class Controller {
         let gain = 0.5;
         const gamepad = vrController.getGamepad();
         if (gamepad) {
-            gain = Math.log10(1 + 9 * gamepad.buttons[1].value);
+            gain = 0;
+            if (gamepad.buttons[0].touched) {
+                // gain = Math.log10(1 + 9 * (gamepad.axes[1] + 1) / 2);
+                // Let's try the opposite of log, x^2
+                const gainNormalized = (gamepad.axes[1] + 1) / 2;
+                gain = gainNormalized * gainNormalized;
+                console.log(gain);
+            }
+            // gain = Math.log10(1 + 9 * gamepad.buttons[1].value);
         }
 
         const posLocal = pos.clone();
         this.rootObject.worldToLocal(posLocal);
-        console.log(posLocal);
         // check is inside space if not, gain 0
         if (Math.abs(posLocal.z) > this.keyLength/2 || Math.abs(posLocal.y) > 0.3) {
             audio.onChange(null, 0);
@@ -111,7 +123,7 @@ export default class Controller {
         this.resetHighlights();
         for (let i = 0; i < controllers.length; i++) {
             if (controllers[i].getButtonState('grips')) {
-                this.moveKeys(controllers[i].realPosition, controllers[i].rotation);
+                this.moveKeys(controllers[i].realPosition, controllers[i].realRotation);
             }
             this.changeAudioFromController(controllers[i], this.audio[i]);
         }

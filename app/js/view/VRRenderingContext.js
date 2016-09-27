@@ -27,9 +27,7 @@ export default class VRRenderingContext extends RenderingContext {
         const head = { position: this.getHeadsetPosition(), rotation: this.getHeadsetRotation() };
         for (let i = 0; i < this.controllers.length; i++) {
             this.controllers[i].update();
-            const controlPos = this.controllers[i].position.clone();
-            controlPos.applyMatrix4(this.controllers[i].standingMatrix);
-            this.controllers[i].realPosition = controlPos;
+            this.controllers[i].matrixWorld.decompose(this.controllers[i].realPosition, this.controllers[i].realRotation, this.controllers[i].realScale);
         }
         this.emit('onControllerPositionChange', { controllers: this.controllers, head: head });
         
@@ -58,6 +56,9 @@ export default class VRRenderingContext extends RenderingContext {
             for (const controller of this.controllers) {
                 controller.add(object.clone());
                 controller.standingMatrix = this.controls.getStandingMatrix();
+                controller.realPosition = new THREE.Vector3();
+                controller.realRotation = new THREE.Euler();
+                controller.realScale = new THREE.Vector3();
                 this.scene.add(controller);
             }
         });
