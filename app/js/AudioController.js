@@ -88,7 +88,7 @@ export default class AudioController {
         this.gainNode.gain.node = 0;
 
         this.volNode = this.context.createGain();
-        this.volNode.gain.value = 0.8;
+        this.volNode.gain.value = 0.35;
 
         this.filter = this.context.createBiquadFilter();
         this.filter.type = 'lowpass';
@@ -103,6 +103,7 @@ export default class AudioController {
         this.gainNode.connect(this.volNode);
         // this.filter.connect(this.volNode);
         this.volNode.connect(this.convolver);
+        // this.volNode.connect(this.context.destination);
         this.convolver.connect(this.context.destination);
         this.oscillator.connect(this.gainNode);
 
@@ -117,7 +118,7 @@ export default class AudioController {
             '../resources/arena.wav'
             ],
             (bufferList) => {
-                const impulseResponses = []
+                const impulseResponses = [];
                 for (let i = 0; i < bufferList.length; i++)
                     impulseResponses.push(bufferList[i]);
               
@@ -135,6 +136,12 @@ export default class AudioController {
             if (gain !== null) {
                 this.gainNode.gain.value = this._calculateGain(gain);
             }
+        }
+    }
+
+    detune(cents) {
+        if (this.oscillator) {
+            this.oscillator.detune.value = cents;
         }
     }
 

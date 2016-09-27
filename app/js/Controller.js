@@ -88,13 +88,17 @@ export default class Controller {
         const gamepad = vrController.getGamepad();
         if (gamepad) {
             gain = 0;
+            let detuneCents = 0;
             if (gamepad.buttons[0].touched) {
                 // gain = Math.log10(1 + 9 * (gamepad.axes[1] + 1) / 2);
                 // Let's try the opposite of log, x^2
                 const gainNormalized = (gamepad.axes[1] + 1) / 2;
                 gain = gainNormalized * gainNormalized;
                 console.log(gain);
+                // detuneCents = 100*gamepad.axes[0];
             }
+            audio.detune(detuneCents);
+
             // gain = Math.log10(1 + 9 * gamepad.buttons[1].value);
         }
 
