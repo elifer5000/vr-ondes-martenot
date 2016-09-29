@@ -17,7 +17,7 @@ export default class VRRenderingContext extends RenderingContext {
             document.body.appendChild( THREE.WEBVR.getButton( this.effect ) );
             setTimeout(() => {
                 this.effect.requestPresent();
-            }, 500);
+            }, 1000);
         }
         this.addControllers();
     }

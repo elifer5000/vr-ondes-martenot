@@ -7,10 +7,10 @@ export default class RenderingContextFactory {
     }
 
     createRenderingContext(domContainer) {
-        if (this.type === 'vr') {
-            return new VRRenderingContext(domContainer);
-        } else {
+        if (this.type === 'emu') {
             return new StandardRenderingContext(domContainer);
+        } else {
+            return new VRRenderingContext(domContainer);
         }
     }
 
