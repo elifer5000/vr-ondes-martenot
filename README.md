@@ -2,6 +2,8 @@
 
 Inspired by the [ondes martenot](https://www.youtube.com/watch?v=v0aflcF0-ys) this is a WebVR based application that attempts to recreate the experience of playing one.
 
+[Here's a demo](https://youtu.be/kfknkYkHuNs)
+
 ## Requirements
 * An HTC Vive
 * Chrome experimental version (get it from [webvr.info](https://webvr.info/get-chrome/))
