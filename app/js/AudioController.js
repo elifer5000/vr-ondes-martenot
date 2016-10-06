@@ -73,6 +73,8 @@ export default class AudioController {
         this.notesToFreq = mapNotesToFrequency();
         this.context = new AudioContext();
 
+        this.oscillator = this.context.createOscillator();
+
         this.LFO = this.context.createOscillator();
         this.LFO.type = 'sine';
         this.LFO.frequency.value = 1; // Hz
@@ -86,52 +88,85 @@ export default class AudioController {
         this.gainNode.gain.value = 0;
 
         this.volNode = this.context.createGain();
-        this.volNode.gain.value = 0.35;
+        this.volNode.gain.value = 0.2;
 
         this.filter = this.context.createBiquadFilter();
         this.filter.type = 'lowpass';
-        this.filter.frequency.value = 2000;
+        this.filter.frequency.value = 1800;
         // this.filter.Q.value = 5;
+
+        this.delay = this.context.createDelay();
+        this.delay.delayTime.value = 0.3;
+
+        this.delayFeedback = this.context.createGain();
+        this.delayFeedback.gain.value = 0.7;
+
+        this.delay.connect(this.delayFeedback);
+        this.delayFeedback.connect(this.delay);
 
         this.initBufferLoader();
 
         this.LFO.connect(this.LFOGainNode);
+
+        this.LFOGainNode.connect(this.oscillator.frequency); // FM
+        this.oscillator.connect(this.gainNode);
 
         this.gainNode.connect(this.filter);
         this.filter.connect(this.volNode);
         this.volNode.connect(this.convolver);
         // this.volNode.connect(this.context.destination);
         this.convolver.connect(this.context.destination);
+        this.delay.connect(this.context.destination);
 
         this.LFO.start();
+        this.oscillator.start();
 
-        // Simple
-        // this.addHarmonics([1.0]);
-        // Trapezium
-        // this.addHarmonics([0.993, 0.0, 0.314, 0.0, 0.168, 0.0, 0.101, 0.0, 0.060, 0.0, 0.033]);
-
-        // Violin
-        this.addHarmonics([ 0.995, 0.940, 0.425, 0.480, 0.000, 0.365, 0.040]); // 0.085, 0.000, 0.090, 0.000]);
+        this.setSound('sawtooth');
+        this.setDelay(true);
     }
 
-    addHarmonics(harmonicsAmps) {
-        this.harmonics = [];
-        for (const amp of harmonicsAmps) {
-            const oscHarmony = this.context.createOscillator();
-            oscHarmony.type = 'sine';
-
-            const gainHarmony = this.context.createGain();
-            gainHarmony.gain.value = amp;
-
-            this.LFOGainNode.connect(oscHarmony.frequency); // FM
-
-            oscHarmony.connect(gainHarmony);
-            gainHarmony.connect(this.gainNode);
-
-            this.harmonics.push(oscHarmony);
-
-            oscHarmony.start();
+    setSound(soundName) {
+        switch (soundName) {
+            case 'sine':
+                this.updateSoundWave([1.0, 1.0],
+                                    [0.0, 0.0]);
+                break;
+            case 'trapezium':
+                this.updateSoundWave([1.273, 0.993, 0.0, 0.314, 0.0, 0.168, 0.0, 0.101, 0.0, 0.060, 0.0, 0.033],
+                                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+                break;
+            case 'violin':
+                this.updateSoundWave([0.49, 0.995, 0.94, 0.425, 0.480, 0, 0.365, 0.04, 0.085, 0, 0.09, 0],
+                                [0, 0, Math.PI / 2, 0, Math.PI / 2, 0, Math.PI / 2, 0, Math.PI / 2, 0, Math.PI / 2, 0]);
+                break;
+            case 'square':
+                this.updateSoundWave([4/Math.PI,1,0,0.3333,0,0.2,0,0.1429,0,0.1111,0,0.0909],
+                                    [0,0,0,0,0,0,0,0,0,0,0,0]);
+                break;
+            case 'triangle':
+                this.updateSoundWave([0.81,1,0,0.11111,0,0.04,0,0.02041,0,0.0123,0,0.0083],
+                                    [0,Math.PI/2,0,Math.PI/2,0,Math.PI/2,0,Math.PI/2,0,Math.PI/2,0,Math.PI/2]);
+                break;
+            case 'sawtooth':
+                this.updateSoundWave([2/Math.PI,1,0.5,0.333,0.25,0.2,0.1667,0.1429,0.125,0.1111,0.1,0.0909],
+                                    [0,0,0,0,0,0,0,0,0,0,0,0]);
+                break;
         }
+    }
+
+    updateSoundWave(amps, phases) {
+        const curveSin = new Float32Array(amps.length);
+        const curveCos = new Float32Array(amps.length);
+        curveSin[0] = 0;
+        curveCos[0] = 0;
+
+        for (let i = 1; i < amps.length; ++i) {
+            curveSin[i] = amps[i] * amps[0] * Math.cos(phases[i]);
+            curveCos[i] = amps[i] * amps[0] * Math.sin(phases[i]);
+        }
+
+        const waveTable = this.context.createPeriodicWave(curveCos, curveSin);
+        this.oscillator.setPeriodicWave(waveTable);
     }
 
     initBufferLoader() {
@@ -153,9 +188,10 @@ export default class AudioController {
     onChange(pos, gain) {
         if (pos !== null) {
             const freq = this._calculateFrequency(pos + this.width / 2);
-            for (let i = 0; i < this.harmonics.length; i++) {
-                this.harmonics[i].frequency.value = freq * (i + 1);
-            }
+            this.oscillator.frequency.value = freq;
+            // for (let i = 0; i < this.harmonics.length; i++) {
+            //     this.harmonics[i].frequency.value = freq * (i + 1);
+            // }
         }
         if (gain !== null) {
             this.gainNode.gain.value = this._calculateGain(gain);
@@ -163,8 +199,17 @@ export default class AudioController {
     }
 
     detune(cents) {
-        for (let i = 0; i < this.harmonics.length; i++) {
-            this.harmonics[i].detune.value = cents;
+        // for (let i = 0; i < this.harmonics.length; i++) {
+        //     this.harmonics[i].detune.value = cents;
+        // }
+        this.oscillator.detune.value = cents;
+    }
+
+    setDelay(val) {
+        if (val) {
+            this.convolver.connect(this.delay);
+        } else {
+            this.convolver.disconnect(this.delay);
         }
     }
 
