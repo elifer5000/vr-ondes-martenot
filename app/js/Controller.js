@@ -73,7 +73,10 @@ export default class Controller {
     }
 
     moveKeys(pos, orientation) {
+        const downVec = new THREE.Vector3(0, -0.05, 0);
+        downVec.applyEuler(orientation);
         this.rootObject.position.copy(pos);
+        this.rootObject.position.add(downVec);
         this.rootObject.rotation.copy(orientation);
     }
 
