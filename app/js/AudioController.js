@@ -189,9 +189,6 @@ export default class AudioController {
         if (pos !== null) {
             const freq = this._calculateFrequency(pos + this.width / 2);
             this.oscillator.frequency.value = freq;
-            // for (let i = 0; i < this.harmonics.length; i++) {
-            //     this.harmonics[i].frequency.value = freq * (i + 1);
-            // }
         }
         if (gain !== null) {
             this.gainNode.gain.value = this._calculateGain(gain);
@@ -199,9 +196,6 @@ export default class AudioController {
     }
 
     detune(cents) {
-        // for (let i = 0; i < this.harmonics.length; i++) {
-        //     this.harmonics[i].detune.value = cents;
-        // }
         this.oscillator.detune.value = cents;
     }
 
