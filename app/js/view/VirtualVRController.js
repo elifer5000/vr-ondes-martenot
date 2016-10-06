@@ -21,7 +21,7 @@ export default class VirtualVRController extends Observable {
         this.renderingContext.scene.add(this.control);
 
         this.control.addEventListener( 'objectChange', () => {
-            this.emit('onPositionChange');
+            this.dispatchEvent('onPositionChange');
         });
 
         this.thumbpadIsPressed = false;
@@ -39,12 +39,21 @@ export default class VirtualVRController extends Observable {
         switch (e.keyCode) {
             case 32: // space
                 this.gripsArePressed = true;
+                this.dispatchEvent('gripsdown');
                 break;
             case 49: // 1
                 this.control.setMode('translate');
                 break;
             case 50: // 2
                 this.control.setMode('rotate');
+                break;
+            case 53: // 5
+                this.triggerIsPressed = true;
+                this.dispatchEvent('triggerdown');
+                break;
+            case 54: // 6
+                this.menuIsPressed = true;
+                this.dispatchEvent('menudown');
                 break;
         }
     }
@@ -53,6 +62,15 @@ export default class VirtualVRController extends Observable {
         switch (e.keyCode) {
             case 32: // space
                 this.gripsArePressed = false;
+                this.dispatchEvent('gripsup');
+                break;
+            case 53: // 5
+                this.triggerIsPressed = false;
+                this.dispatchEvent('triggerup');
+                break;
+            case 54: // 6
+                this.menuIsPressed = false;
+                this.dispatchEvent('menuup');
                 break;
         }
     }
@@ -65,7 +83,7 @@ export default class VirtualVRController extends Observable {
         this.mesh.position.copy(this.renderingContext.camera.position);
         this.mesh.position.add(dir.multiplyScalar(2));
         this.control.update();
-        this.emit('onPositionChange');
+        this.dispatchEvent('onPositionChange');
     }
 
     get realPosition() {
@@ -87,7 +105,7 @@ export default class VirtualVRController extends Observable {
     getButtonState(button) {
         if (button === 'grips') return this.gripsArePressed;
         if (button === 'trigger') return this.triggerIsPressed;
-
+        if (button === 'menu') return this.menuIsPressed;
     }
 
     getGamepad() {

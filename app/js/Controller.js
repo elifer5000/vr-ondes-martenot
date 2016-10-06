@@ -28,6 +28,13 @@ export default class Controller {
         this.addKeysToScene();
 
         this.highlightColor = new THREE.Color(0xFFFF00);
+
+        for (let index = 0; index < this.view.renderingContext.controllers.length; index++) {
+            const controller = this.view.renderingContext.controllers[index];
+            controller.addEventListener('triggerdown', () => { this.onTriggerDown(index); });
+            controller.addEventListener('menudown', () => { this.onMenuDown(index); });
+        }
+
     }
 
     createKeyGeometry(isSharp) {
@@ -123,12 +130,21 @@ export default class Controller {
         }
     }
 
+    onTriggerDown(index) {
+        this.audio[index].selectNextSound();
+    }
+
+    onMenuDown(index) {
+        this.audio[index].toggleDelay();
+    }
+
     onControllerMoved(controllers, head) {
         this.resetHighlights();
         for (let i = 0; i < controllers.length; i++) {
             if (controllers[i].getButtonState('grips')) {
                 this.moveKeys(controllers[i].realPosition, controllers[i].realRotation);
             }
+
             this.changeAudioFromController(controllers[i], this.audio[i]);
         }
     }

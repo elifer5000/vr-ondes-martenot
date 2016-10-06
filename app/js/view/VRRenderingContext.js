@@ -29,7 +29,7 @@ export default class VRRenderingContext extends RenderingContext {
             this.controllers[i].update();
             this.controllers[i].matrixWorld.decompose(this.controllers[i].realPosition, this.controllers[i].realRotation, this.controllers[i].realScale);
         }
-        this.emit('onControllerPositionChange', { controllers: this.controllers, head: head });
+        this.dispatchEvent('onControllerPositionChange', { controllers: this.controllers, head: head });
         
         this.effect.render(this.scene, this.camera);
     }

@@ -3,16 +3,16 @@ export default class Observable {
         this.observers = new Map();
     }
 
-    addObserver(label, callback) {
+    addEventListener(label, callback) {
         this.observers.has(label) || this.observers.set(label, []);
         this.observers.get(label).push(callback);
     }
 
-    removeObserver(label) {
+    removeEventListener(label) {
         this.observers.delete(label);
     }
 
-    emit(label, e = {}) {
+    dispatchEvent(label, e = {}) {
         const observers = this.observers.get(label);
 
         if (observers && observers.length) {

@@ -18,7 +18,7 @@ export default class MainView {
 
     initialize() {
         window.addEventListener( 'resize', (e) => this.onWindowResize(), false );
-        this.renderingContext.addObserver( 'onControllerPositionChange', (e) => {
+        this.renderingContext.addEventListener( 'onControllerPositionChange', (e) => {
             
             this.controller.onControllerMoved(e.controllers, e.head);
         });
