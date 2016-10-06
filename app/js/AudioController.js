@@ -166,7 +166,7 @@ export default class AudioController {
     initBufferLoader() {
         const bufferLoader = new BufferLoader(this.context,
             [  //List of preloaded impulse files
-            '../resources/arena.wav'
+            './resources/arena.wav'
             ],
             (bufferList) => {
                 const impulseResponses = [];
