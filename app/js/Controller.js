@@ -140,16 +140,22 @@ export default class Controller {
         }
 
         audio.onChange(posLocal.x, gain);
+        let currentNote = null;
         for (const n in this.notes) {
             const note = this.notes[n];
 
             if (Math.abs(posLocal.x - note.position.x) < 0.005) {
                 note.mesh.material.color = this.highlightColor;
-                //if (gamepad) {
-                //    gamepad.haptics[0].vibrate(0.05, 25);
-                //}
+
+                if (gamepad && gamepad.haptics && vrController.lastNote !== note) {
+                    gamepad.haptics[0].vibrate(0.05, 25);
+                }
+                currentNote = note;
+                break;
             }
         }
+
+        vrController.lastNote = currentNote;
     }
 
     updateSoundName(index) {
