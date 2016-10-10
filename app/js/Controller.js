@@ -120,9 +120,9 @@ export default class Controller {
             let detuneCents = 0;
             if (gamepad.buttons[0].touched) {
                 // gain = Math.log10(1 + 9 * (gamepad.axes[1] + 1) / 2);
-                // Let's try the opposite of log, x^2
-                const gainNormalized = 0.8*(gamepad.axes[1] + 1) / 2 + 0.2;
-                gain = gainNormalized * gainNormalized;
+                // Let's try the opposite of log, x^3
+                const gainNormalized = (Math.max(-0.5, gamepad.axes[1]) + 0.5) / 1.5;
+                gain = gainNormalized * gainNormalized * gainNormalized * gainNormalized;
                 // console.log(gain);
                 // detuneCents = 100*gamepad.axes[0];
             }
