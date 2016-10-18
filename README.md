@@ -4,7 +4,9 @@ Inspired by the [ondes martenot](https://www.youtube.com/watch?v=v0aflcF0-ys) th
 
 [Here's a video](https://youtu.be/kfknkYkHuNs)
 
-[And here's a hosted demo](https://elifer5000.github.io/vr-ondes-martenot/dist/index.html)
+[And here's a hosted demo](https://elifer5000.github.io/vr-ondes-martenot/dist/index.html)  ([emulated version](https://elifer5000.github.io/vr-ondes-martenot/dist/index.html?mode=emu))
+
+![pic](screenshot.png)
 
 ## Requirements
 * An HTC Vive
