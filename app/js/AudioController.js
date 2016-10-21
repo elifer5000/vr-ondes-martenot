@@ -137,6 +137,12 @@ export default class AudioController {
 
         this.isDelayEnabled = false;
         // this.setDelay(true);
+
+        this.analyser = this.context.createAnalyser();
+        this.volNode.connect(this.analyser);
+        this.delay.connect(this.analyser);
+        const bufferLength = this.analyser.frequencyBinCount;
+        this.dataArray = new Float32Array(bufferLength);
     }
 
     setSound(sound) {
@@ -231,6 +237,12 @@ export default class AudioController {
         }
 
         return this.notesToFreq;
+    }
+
+    getWaveFormData() {
+        this.analyser.getFloatTimeDomainData(this.dataArray);
+
+        return this.dataArray;
     }
 
     _calculateFrequency(val) {

@@ -28,19 +28,21 @@ export default class Controller {
 
         this.highlightColor = new THREE.Color(0xFFFF00);
 
-
         for (let index = 0; index < this.view.renderingContext.controllers.length; index++) {
             const controller = this.view.renderingContext.controllers[index];
             controller.addEventListener('triggerdown', () => { this.onTriggerDown(index); });
             controller.addEventListener('menudown', () => { this.onMenuDown(index); });
         }
         const loader = new THREE.FontLoader();
-
+        this.waveGeometry = [];
         loader.load('resources/helvetiker_regular.typeface.json', ( font ) => {
             this.font = font;
             console.log('font loaded');
             this.addKeysToScene();
+            this.createWaveVisualization(0);
+            this.createWaveVisualization(1);
         });
+
     }
 
     createKeyGeometry(isSharp) {
@@ -106,6 +108,37 @@ export default class Controller {
         }
     }
 
+    createWaveVisualization(index) {
+        const geo = new THREE.Geometry();
+        const width =  0.5;
+        const bufferLength = 1024;
+        const offset = (index === 0) ? -this.keyboardWidth/3 : this.keyboardWidth/4.5;
+        for (let i = 0; i < bufferLength; i++) {
+            const vertex = new THREE.Vector3(offset + -width/2 + i*width/(bufferLength-1), 0.3, -this.keyLength / 2);
+            geo.vertices.push(vertex);
+        }
+        const points = new THREE.Line(geo);//, new THREE.LineBasicMaterial( { color: 'red', linewidth: 0.001 } ));
+
+        this.rootObject.add(points);
+        this.waveGeometry.push(points);
+    }
+
+    updateWaveVisualization(index) {
+        if (!this.waveGeometry || index >= this.waveGeometry.length) {
+            return;
+        }
+        const waveform = this.audio[index].getWaveFormData();
+        let maxv = 0;
+        const halfHeight = 0.2;
+        // console.log(waveform.data.length);
+        for (let i = 0; i < waveform.length; i++) {
+            this.waveGeometry[index].geometry.vertices[i].y = 0.3 + halfHeight*waveform[i];
+            maxv = Math.max(maxv, waveform[i]);
+        }
+        console.log(maxv);
+        this.waveGeometry[index].geometry.verticesNeedUpdate = true;
+    }
+
     changeAudioFromController(vrController, audio) {
         if (!this.rootObject) {
             return;
@@ -113,7 +146,7 @@ export default class Controller {
 
         const pos = vrController.realPosition;
            
-        let gain = 0.5;
+        let gain = 0.99;
         const gamepad = vrController.getGamepad();
         if (gamepad) {
             gain = 0;
@@ -127,15 +160,13 @@ export default class Controller {
                 // detuneCents = 100*gamepad.axes[0];
             }
             audio.detune(detuneCents);
-
-            // gain = Math.log10(1 + 9 * gamepad.buttons[1].value);
         }
 
         const posLocal = pos.clone();
         this.rootObject.worldToLocal(posLocal);
         // check is inside space if not, gain 0
-        if (Math.abs(posLocal.z) > this.keyLength/2 || Math.abs(posLocal.y) > 0.3) {
-            audio.onChange(null, 0);
+        if (Math.abs(posLocal.z) > this.keyLength/2 || Math.abs(posLocal.y) > 0.3 || Math.abs(posLocal.x) > this.keyboardWidth/2) {
+            audio.onChange(0, 0);
             return;
         }
 
@@ -201,6 +232,7 @@ export default class Controller {
             }
 
             this.changeAudioFromController(controllers[i], this.audio[i]);
+            this.updateWaveVisualization(i);
         }
     }
 }
