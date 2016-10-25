@@ -20,10 +20,11 @@ export default class Controller {
 
     initialize() {
         const room = new THREE.Mesh(
-            new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
-            new THREE.MeshBasicMaterial( { color: 0x404040, wireframe: true } )
+            new THREE.BoxBufferGeometry( 6, 6, 6, 8, 8, 8 ),
+            new THREE.MeshStandardMaterial( { color: 0xA0A0A0, wireframe: false, side: THREE.BackSide } )
         );
         room.position.y = 3;
+        room.receiveShadow = true;
         this.view.scene.add( room );
 
         this.highlightColor = new THREE.Color(0xFFFF00);
@@ -56,6 +57,8 @@ export default class Controller {
                                         new THREE.MeshStandardMaterial( { color: 0x838380 }));
 
         baseMesh.position.y -= 1.05*this.keyHeight / 2;
+        baseMesh.castShadow = true;
+        baseMesh.receiveShadow = true;
         this.rootObject.add(baseMesh);
         // console.log(this.notes);
         for (const n in this.notes) {
@@ -90,6 +93,7 @@ export default class Controller {
         this.rootObject.position.set(0.4, 0.5, -2);
         // this.rootObject.rotation.set(0, 0, 0);
 
+        this.view.renderingContext.addSpotlight(this.rootObject);
         this.view.scene.add(this.rootObject);
     }
 
