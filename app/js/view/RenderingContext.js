@@ -21,7 +21,7 @@ export default class RenderingContext extends Observable {
         // light2.target.position.set(0, 0, 0);
         // this.scene.add( light2 );
         //
-        this.scene.add(new THREE.HemisphereLight( 0xffffff, 0x005570, 0.6 ));
+        this.scene.add(new THREE.HemisphereLight( 0xffffff, 0x005570, 0.15 ));
     }
 
     addSpotlight(rootObj) {
@@ -33,7 +33,7 @@ export default class RenderingContext extends Observable {
 
         this.spotLight.distance = 4;
 
-        this.spotLight.angle = Math.PI / 3;
+        this.spotLight.angle = Math.PI / 4;
 
         this.spotLight.penumbra = 0.1;
 
