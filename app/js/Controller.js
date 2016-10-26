@@ -19,13 +19,13 @@ export default class Controller {
     }
 
     initialize() {
-        const room = new THREE.Mesh(
-            new THREE.BoxBufferGeometry( 6, 6, 6, 8, 8, 8 ),
-            new THREE.MeshStandardMaterial( { color: 0xA0A0A0, wireframe: false, side: THREE.BackSide } )
+        this.room = new THREE.Mesh(
+            new THREE.BoxBufferGeometry( 6, 6, 6, 8, 8, 8 ), this.createRoomMaterial()
         );
-        room.position.y = 3;
-        room.receiveShadow = true;
-        this.view.scene.add( room );
+        this.room.position.y = 3;
+
+        this.room.receiveShadow = true;
+        this.view.scene.add( this.room );
 
         this.highlightColor = new THREE.Color(0xFFFF00);
 
@@ -40,10 +40,28 @@ export default class Controller {
             this.font = font;
             console.log('font loaded');
             this.addKeysToScene();
-            this.createWaveVisualization(0);
-            this.createWaveVisualization(1);
+            // this.createWaveVisualization(0);
+            // this.createWaveVisualization(1);
         });
 
+    }
+
+    createRoomMaterial() {
+        this.createAudioTexture();
+
+        this.texturedMaterial = new THREE.MeshStandardMaterial( { map: this.audioDataTex, emissive: 0xfffdfb, emissiveIntensity: 0.15, side: THREE.BackSide } )
+        const floorMaterial = new THREE.MeshStandardMaterial( { color: 0xA0A0A0, side: THREE.BackSide } );
+
+        const materials = [];
+        for (let i = 0; i < 6; i++) {
+            if (i === 3) {
+                materials.push(floorMaterial);
+            } else {
+                materials.push(this.texturedMaterial);
+            }
+        }
+
+        return new THREE.MeshFaceMaterial(materials);
     }
 
     createKeyGeometry(isSharp) {
@@ -139,8 +157,57 @@ export default class Controller {
             this.waveGeometry[index].geometry.vertices[i].y = 0.3 + halfHeight*waveform[i];
             maxv = Math.max(maxv, waveform[i]);
         }
-        console.log(maxv);
+        // console.log(maxv);
         this.waveGeometry[index].geometry.verticesNeedUpdate = true;
+    }
+
+    createAudioTexture() {
+        const size = 256;
+        const rgba = new Uint8Array(size * size * 4);
+        for (var i = 0; i < size * size; i++) {
+            // RGB from 0 to 255
+            rgba[4 * i] = 255 * Math.random();
+            rgba[4 * i + 1] = 255 * Math.random();
+            rgba[4 * i + 2] = 255 * Math.random();
+            //255 * i / (4 * 4);
+            // OPACITY
+            rgba[4 * i + 3] = 255;
+        }
+
+        this.audioDataTex = new THREE.DataTexture(rgba, size, size, THREE.RGBAFormat);
+        this.audioDataTex.needsUpdate = true;
+        this.currentAudioTexIntensity = 0;
+        console.log('dd', this.currentAudioTexIntensity);
+    }
+
+
+    updateAudioTexture() {
+        if (!this.audioDataTex) return;
+
+        const freqs0 = this.audio[0].getFrequencyData();
+        const freqs1 = this.audio[1].getFrequencyData();
+
+        const size = 256;
+        const rgba = this.audioDataTex.image.data;
+        let max = 0;
+        for (var i = 0; i < size * size; i++) {
+            // RGB from 0 to 255
+            rgba[4 * i] = 0;//Math.max(freqs0[i % 1024], freqs1[i % 1024]);
+            rgba[4 * i + 1] = Math.max(freqs0[i % 1024], freqs1[i % 1024]);
+            rgba[4 * i + 2] = Math.max(freqs0[i % 1024], freqs1[i % 1024]);
+            //255 * i / (4 * 4);
+            // OPACITY
+            rgba[4 * i + 3] = 255;
+            max = Math.max(max, Math.max(freqs0[i % 1024], freqs1[i % 1024]));
+        }
+        // console.log(max);
+        // Get average volume
+
+        const volume = Math.max(this.audio[0].getVolume(), this.audio[1].getVolume());
+        this.currentAudioTexIntensity = this.currentAudioTexIntensity + 0.05*(volume - this.currentAudioTexIntensity);
+        console.log(this.currentAudioTexIntensity, volume);
+        this.texturedMaterial.emissiveIntensity = Math.min(0.6, this.currentAudioTexIntensity);
+        this.audioDataTex.needsUpdate = true;
     }
 
     changeAudioFromController(vrController, audio) {
@@ -236,7 +303,8 @@ export default class Controller {
             }
 
             this.changeAudioFromController(controllers[i], this.audio[i]);
-            this.updateWaveVisualization(i);
+            // this.updateWaveVisualization(i);
         }
+        this.updateAudioTexture();
     }
 }

@@ -139,10 +139,13 @@ export default class AudioController {
         // this.setDelay(true);
 
         this.analyser = this.context.createAnalyser();
+        this.analyser.fftSize = 2048;
+        this.analyser.smoothingTimeConstant = 0.3;
         this.volNode.connect(this.analyser);
         this.delay.connect(this.analyser);
         const bufferLength = this.analyser.frequencyBinCount;
-        this.dataArray = new Float32Array(bufferLength);
+        this.floatDataArray = new Float32Array(bufferLength);
+        this.uintDataArray = new Uint8Array(bufferLength);
     }
 
     setSound(sound) {
@@ -240,9 +243,27 @@ export default class AudioController {
     }
 
     getWaveFormData() {
-        this.analyser.getFloatTimeDomainData(this.dataArray);
+        this.analyser.getFloatTimeDomainData(this.floatDataArray);
 
-        return this.dataArray;
+        return this.floatDataArray;
+    }
+
+    getFrequencyData() {
+        this.analyser.getByteFrequencyData(this.uintDataArray);
+
+        return this.uintDataArray;
+    }
+
+    getVolume() {
+        this.getWaveFormData();
+        let max = 0;
+        const length = this.floatDataArray.length;
+
+        for (let i = 0; i < length; i++) {
+            max = Math.max(Math.abs(this.floatDataArray[i]), max);
+        }
+
+        return max;
     }
 
     _calculateFrequency(val) {
