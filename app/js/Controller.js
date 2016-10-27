@@ -140,7 +140,7 @@ export default class Controller {
             const vertex = new THREE.Vector3(offset + -width/2 + i*width/(bufferLength-1), 0.3, -this.keyLength / 2);
             geo.vertices.push(vertex);
         }
-        const points = new THREE.Line(geo);//, new THREE.LineBasicMaterial( { color: 'red', linewidth: 0.001 } ));
+        const points = new THREE.Line(geo);
 
         this.rootObject.add(points);
         this.waveGeometry.push(points);
@@ -167,10 +167,9 @@ export default class Controller {
         const rgba = new Uint8Array(size * size * 4);
         for (var i = 0; i < size * size; i++) {
             // RGB from 0 to 255
-            rgba[4 * i] = 0; //255 * Math.random();
-            rgba[4 * i + 1] = 0; //255 * Math.random();
-            rgba[4 * i + 2] = 0; //255 * Math.random();
-            //255 * i / (4 * 4);
+            rgba[4 * i] = 0;
+            rgba[4 * i + 1] = 0;
+            rgba[4 * i + 2] = 0;
             // OPACITY
             rgba[4 * i + 3] = 255;
         }
@@ -223,7 +222,7 @@ export default class Controller {
             rgba[4 * i + 1] = lerp(rgba[4 * i + 1], color[1], 0.05);
             rgba[4 * i + 2] = lerp(rgba[4 * i + 2], color[2], 0.05);
             // OPACITY
-            rgba[4 * i + 3] = 255;
+            // rgba[4 * i + 3] = 255;
         }
         // Get average volume
 
