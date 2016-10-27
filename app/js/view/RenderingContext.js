@@ -20,8 +20,9 @@ export default class RenderingContext extends Observable {
         // light2.position.set( -10, 10, -20 );
         // light2.target.position.set(0, 0, 0);
         // this.scene.add( light2 );
-        //
-        this.scene.add(new THREE.HemisphereLight( 0xffffff, 0x005570, 0.15 ));
+
+        this.hemiLight = new THREE.HemisphereLight( 0xffffff, 0x005570, 0.15 );
+        this.scene.add(this.hemiLight);
     }
 
     addSpotlight(rootObj) {

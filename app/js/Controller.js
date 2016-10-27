@@ -1,5 +1,6 @@
 import MainView from './view/MainView';
 import AudioController from './AudioController';
+import {hslToRgb, lerp} from './util';
 
 export default class Controller {
     constructor(renderingContextFactory) {
@@ -166,9 +167,9 @@ export default class Controller {
         const rgba = new Uint8Array(size * size * 4);
         for (var i = 0; i < size * size; i++) {
             // RGB from 0 to 255
-            rgba[4 * i] = 255 * Math.random();
-            rgba[4 * i + 1] = 255 * Math.random();
-            rgba[4 * i + 2] = 255 * Math.random();
+            rgba[4 * i] = 0; //255 * Math.random();
+            rgba[4 * i + 1] = 0; //255 * Math.random();
+            rgba[4 * i + 2] = 0; //255 * Math.random();
             //255 * i / (4 * 4);
             // OPACITY
             rgba[4 * i + 3] = 255;
@@ -176,37 +177,59 @@ export default class Controller {
 
         this.audioDataTex = new THREE.DataTexture(rgba, size, size, THREE.RGBAFormat);
         this.audioDataTex.needsUpdate = true;
-        this.currentAudioTexIntensity = 0;
-        console.log('dd', this.currentAudioTexIntensity);
+        this.currentAudioIntensity = 0;
     }
 
+
+    mapFrequenciesToColor(audio) {
+        const freqs = audio.getFrequencyData();
+        const stepSize = audio.getFrequencyStep();
+
+        const MAX_FREQ = 2500; //44100/2;
+        // 100 hz to 2100 hz
+        let freq = 0;
+        let colors = [];
+        for (let i = 0; i < freqs.length; i++) {
+            freq = i*stepSize;
+            const amp = freqs[i];
+            if (amp > 32) {
+                console.log(freq);
+                const color = hslToRgb(0.65 + freq/MAX_FREQ*0.35, 0.7 + Math.random()*0.3, 0.5);
+                colors.push(color);
+            }
+        }
+
+        return colors;
+    }
 
     updateAudioTexture() {
         if (!this.audioDataTex) return;
 
-        const freqs0 = this.audio[0].getFrequencyData();
-        const freqs1 = this.audio[1].getFrequencyData();
+        const colors1 = this.mapFrequenciesToColor(this.audio[0]);
+        const colors2 = this.mapFrequenciesToColor(this.audio[1]);
+        const colors = colors1.concat(colors2);
 
         const size = 256;
         const rgba = this.audioDataTex.image.data;
-        let max = 0;
-        for (var i = 0; i < size * size; i++) {
+        for (let i = 0; i < size * size; i++) {
+            let color = [0, 0, 0];
+
+            if (colors.length > 0) {
+                const randIndex = Math.floor((colors.length - 1) * Math.random());
+                color = colors[randIndex];
+            }
             // RGB from 0 to 255
-            rgba[4 * i] = 0;//Math.max(freqs0[i % 1024], freqs1[i % 1024]);
-            rgba[4 * i + 1] = Math.max(freqs0[i % 1024], freqs1[i % 1024]);
-            rgba[4 * i + 2] = Math.max(freqs0[i % 1024], freqs1[i % 1024]);
-            //255 * i / (4 * 4);
+            rgba[4 * i] = lerp(rgba[4 * i], color[0], 0.05);
+            rgba[4 * i + 1] = lerp(rgba[4 * i + 1], color[1], 0.05);
+            rgba[4 * i + 2] = lerp(rgba[4 * i + 2], color[2], 0.05);
             // OPACITY
             rgba[4 * i + 3] = 255;
-            max = Math.max(max, Math.max(freqs0[i % 1024], freqs1[i % 1024]));
         }
-        // console.log(max);
         // Get average volume
 
         const volume = Math.max(this.audio[0].getVolume(), this.audio[1].getVolume());
-        this.currentAudioTexIntensity = this.currentAudioTexIntensity + 0.05*(volume - this.currentAudioTexIntensity);
-        console.log(this.currentAudioTexIntensity, volume);
-        this.texturedMaterial.emissiveIntensity = Math.min(0.6, this.currentAudioTexIntensity);
+        this.currentAudioIntensity = lerp(this.currentAudioIntensity, volume, 0.05); //this.currentAudioIntensity + 0.05*(volume - this.currentAudioIntensity);
+        this.view.renderingContext.hemiLight.intensity = Math.max(0.15, 3*this.currentAudioIntensity);
         this.audioDataTex.needsUpdate = true;
     }
 

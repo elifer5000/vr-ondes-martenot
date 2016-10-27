@@ -266,6 +266,10 @@ export default class AudioController {
         return max;
     }
 
+    getFrequencyStep() {
+        return this.context.sampleRate / this.analyser.fftSize;
+    }
+
     _calculateFrequency(val) {
         var baseFreq = 440; // A4
         var baseSteps = 9; // A
