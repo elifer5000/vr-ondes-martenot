@@ -271,8 +271,12 @@ export default class Controller {
             if (Math.abs(posLocal.x - note.position.x) < 0.005) {
                 note.mesh.material.color = this.highlightColor;
 
-                if (gamepad && gamepad.haptics && vrController.lastNote !== note) {
-                    gamepad.haptics[0].vibrate(0.05, 25);
+                if (gamepad && vrController.lastNote !== note) {
+                    if (gamepad.haptics) { // Old version. Deprecated
+                        gamepad.haptics[0].vibrate(0.25, 25);
+                    } else if (gamepad.hapticActuators) {
+                        gamepad.hapticActuators[0].pulse(0.25, 25);
+                    }
                 }
                 currentNote = note;
                 break;
