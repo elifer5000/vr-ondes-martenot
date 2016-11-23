@@ -163,7 +163,7 @@ export default class Controller {
     }
 
     createAudioTexture() {
-        const size = 256;
+        const size = 64;
         const rgba = new Uint8Array(size * size * 4);
         for (var i = 0; i < size * size; i++) {
             // RGB from 0 to 255
@@ -208,7 +208,7 @@ export default class Controller {
         const colors2 = this.mapFrequenciesToColor(this.audio[1]);
         const colors = colors1.concat(colors2);
 
-        const size = 256;
+        const size = 64;
         const rgba = this.audioDataTex.image.data;
         for (let i = 0; i < size * size; i++) {
             let color = [0, 0, 0];
