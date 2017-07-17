@@ -88,7 +88,7 @@ export default class AudioController {
         this.gainNode.gain.value = 0;
 
         this.volNode = this.context.createGain();
-        this.volNode.gain.value = 0.2;
+        this.volNode.gain.value = 0.15;
 
         this.filter = this.context.createBiquadFilter();
         this.filter.type = 'lowpass';
