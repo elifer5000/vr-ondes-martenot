@@ -41,16 +41,16 @@ export default class Controller {
             this.font = font;
             console.log('font loaded');
             this.addKeysToScene();
-            // this.createWaveVisualization(0);
-            // this.createWaveVisualization(1);
+            this.createWaveVisualization(0);
+            this.createWaveVisualization(1);
         });
 
     }
 
     createRoomMaterial() {
-        this.createAudioTexture();
+        //this.createAudioTexture();
 
-        this.texturedMaterial = new THREE.MeshStandardMaterial( { map: this.audioDataTex, emissive: 0xfffdfb, emissiveIntensity: 0.15, side: THREE.BackSide } )
+        this.texturedMaterial = new THREE.MeshStandardMaterial( { emissive: 0xfffdfb, emissiveIntensity: 0.15, side: THREE.BackSide } )
         const floorMaterial = new THREE.MeshStandardMaterial( { color: 0xA0A0A0, side: THREE.BackSide } );
 
         const materials = [];
@@ -329,8 +329,8 @@ export default class Controller {
             }
 
             this.changeAudioFromController(controllers[i], this.audio[i]);
-            // this.updateWaveVisualization(i);
+            this.updateWaveVisualization(i);
         }
-        this.updateAudioTexture();
+        // this.updateAudioTexture();
     }
 }
