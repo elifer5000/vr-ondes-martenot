@@ -6,7 +6,7 @@ export default class Controller {
     constructor(renderingContextFactory) {
         this.keyboardWidth = 1.0;
         this.keyWidth = 0.0075;
-        this.keySharpWidth = 0.003;
+        this.keySharpWidth = 0.005;
         this.keyHeight = 0.01;
         this.keyLength = 0.2;
 
@@ -263,12 +263,12 @@ export default class Controller {
             return;
         }
 
-        audio.onChange(posLocal.x, gain);
+        
         let currentNote = null;
         for (const n in this.notes) {
             const note = this.notes[n];
 
-            if (Math.abs(posLocal.x - note.position.x) < 0.005) {
+            if (Math.abs(posLocal.x - note.position.x) < 0.0065) {
                 note.mesh.material.color = this.highlightColor;
 
                 if (gamepad && vrController.lastNote !== note) {
@@ -282,6 +282,12 @@ export default class Controller {
                 break;
             }
         }
+        if (currentNote) {
+            audio.onChange(currentNote.position.x, gain);   
+        }
+        else {
+            audio.onChange(posLocal.x, gain);    
+        }            
 
         vrController.lastNote = currentNote;
     }
