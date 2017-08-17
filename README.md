@@ -31,16 +31,13 @@ and then point your browser to
 ```
 http://localhost:8080
 ```
+### Controls
+* Use the grips to position the keys wherever you desire. It is recommended to put it on top of a real table, that way it can be used as a pivot point and better vibrato can be achieved.
+* Use the touchpad in the vertical direction for volume control. No sound is produced until the touchpad is touched.
+* Use the trigger to cycle through the different sounds (Sine, Trapezium, Violin, Square, Triangle, Sawtooth)
+* Use the menu button to turn delay on/off.
 
-Use the grips to position the keys wherever you desire. It is recommended to put it on top of a real table, that way it can be used as a pivot point and better vibrato can be achieved.
-
-Use the touchpad in the vertical direction for volume control. No sound is produced until the touchpad is touched.
-
-Use the trigger to cycle through the different sounds (Sine, Trapezium, Violin, Square, Triangle, Sawtooth)
-
-Use the menu button to turn delay on/off.
-
-
+## Emulation
 You can test the app without VR by using an emulated mode:
 
 ```
