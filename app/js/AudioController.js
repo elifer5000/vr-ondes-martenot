@@ -95,6 +95,7 @@ export default class AudioController {
         this.filter.frequency.value = 1800;
         // this.filter.Q.value = 5;
 
+        // LFO -> VCO -> VCA -> Filter -> Volume -> Delay
         this.delay = this.context.createDelay();
         this.delay.delayTime.value = 0.3;
 
@@ -198,7 +199,8 @@ export default class AudioController {
     onChange(pos, gain) {
         if (pos !== null) {
             const freq = this._calculateFrequency(pos + this.width / 2);
-            this.oscillator.frequency.value = freq;
+            // this.oscillator.frequency.value = freq;
+            this.oscillator.frequency.setTargetAtTime(freq, this.context.currentTime, 0.01);
         }
         if (gain !== null) {
             this.gainNode.gain.value = this._calculateGain(gain);
