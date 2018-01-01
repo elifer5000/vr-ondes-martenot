@@ -244,6 +244,7 @@ export default class Controller {
         if (gamepad) {
             gain = 0;
             let detuneCents = 0;
+            const markerOnPad = vrController.markerOnPad;
             if (gamepad.buttons[0].touched) {
                 // gain = Math.log10(1 + 9 * (gamepad.axes[1] + 1) / 2);
                 // Let's try the opposite of log, x^4
@@ -251,6 +252,16 @@ export default class Controller {
                 gain = gainNormalized * gainNormalized * gainNormalized;
                 // console.log(gain);
                 // detuneCents = 100*gamepad.axes[0];
+
+                const newPosition = new THREE.Vector3(0.0, 0.003785, 0.049204); // Center position
+                newPosition.x = -0.020221 + (0.020221 + 0.020221) * (0.5 * gamepad.axes[0] + 0.5);
+                newPosition.y = 0.002646 + (0.007248 - 0.002646) * (0.5 * gamepad.axes[1] + 0.5);
+                newPosition.z = 0.069432 + (0.029242 - 0.069432) * (0.5 * gamepad.axes[1] + 0.5);
+
+                markerOnPad.position.copy(newPosition);
+                markerOnPad.visible = true;
+            } else {
+                markerOnPad.visible = false;
             }
             audio.detune(detuneCents);
         }
