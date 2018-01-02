@@ -45,6 +45,9 @@ BufferLoader.prototype.load = function() {
   this.loadBuffer(this.urlList[i], i);
 };
 
+var allowedNotes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+// var allowedNotes = ['B', 'C#', 'D', 'E', 'F#', 'G', 'A']; // Bm scale
+
 function mapNotesToFrequency() {
     var baseFreq = 440; // A4
     var baseSteps = 9; // A
@@ -58,6 +61,7 @@ function mapNotesToFrequency() {
     for (var oct = octaveStart; oct <= octaveEnd; oct++) {
         for (var step = 0; step < 12; step++) {
             var freq = baseFreq * Math.pow(2, (oct*12 + step - baseOctave*12 - baseSteps) / 12);
+            if (!allowedNotes.some(x => x === notes[step])) continue;
 
             notesFreqMap[notes[step] + oct.toString()] = { freq: freq, step: oct*12 + step };
         }
