@@ -243,7 +243,7 @@ export default class Controller {
         const gamepad = vrController.getGamepad();
         if (gamepad) {
             gain = 0;
-            let detuneCents = 0;
+            // let detuneCents = 0;
             const markerOnPad = vrController.markerOnPad;
             if (gamepad.buttons[0].touched) {
                 // gain = Math.log10(1 + 9 * (gamepad.axes[1] + 1) / 2);
@@ -263,7 +263,7 @@ export default class Controller {
             } else {
                 markerOnPad.visible = false;
             }
-            audio.detune(detuneCents);
+            // audio.detune(detuneCents);
         }
 
         const posLocal = pos.clone();
