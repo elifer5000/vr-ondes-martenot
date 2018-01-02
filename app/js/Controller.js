@@ -6,7 +6,7 @@ export default class Controller {
     constructor(renderingContextFactory) {
         this.keyboardWidth = 1.0;
         this.keyWidth = 0.0075;
-        this.keySharpWidth = 0.005;
+        this.keySharpWidth = 0.0070;
         this.keyHeight = 0.01;
         this.keyLength = 0.2;
 
