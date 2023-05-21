@@ -1,8 +1,8 @@
 import '../lib/WEBVR';
-import '../../../node_modules/three/examples/js/controls/VRControls';
-import '../../../node_modules/three/examples/js/effects/VREffect';
-import '../../../node_modules/three/examples/js/vr/ViveController';
-import '../../../node_modules/three/examples/js/loaders/OBJLoader';
+// import '../../../node_modules/three/examples/js/controls/VRControls';
+// import '../../../node_modules/three/examples/js/effects/VREffect';
+// import '../../../node_modules/three/examples/js/vr/ViveController';
+// import '../../../node_modules/three/examples/js/loaders/OBJLoader';
 import RenderingContext from './RenderingContext';
 
 export default class VRRenderingContext extends RenderingContext {

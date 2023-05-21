@@ -30,10 +30,10 @@ const config = {
     module: {
         noParse: [/app\/bin/],
         loaders: [
-            {
-                test: require.resolve('three'),
-                loader: 'expose?THREE'
-            },
+            // {
+            //     test: require.resolve('three'),
+            //     loader: 'expose?THREE'
+            // },
             {
                 test: /.jsx?$/,
                 exclude: exclude,

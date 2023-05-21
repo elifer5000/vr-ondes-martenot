@@ -1,4 +1,4 @@
-import '../../../node_modules/three/examples/js/controls/TransformControls';
+// import '../../../node_modules/three/examples/js/controls/TransformControls';
 import Observable from '../Observable';
 
 export default class VirtualVRController extends Observable {

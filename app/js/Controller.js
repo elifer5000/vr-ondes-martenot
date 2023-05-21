@@ -12,14 +12,27 @@ export default class Controller {
 
         this.soundNameMeshes = [ null, null ];
         this.audio = [];
-        this.audio.push(new AudioController(this.keyboardWidth));
-        this.audio.push(new AudioController(this.keyboardWidth));
         this.view = new MainView(this, renderingContextFactory);
         this.view.initialize();
-        this.initialize();
+
+        this.canaudio = document.querySelector('#canaudio');
+        // Ensure the #canaudio element is not checked as some browsers
+        // Will remember it's state
+        this.canaudio.checked = false;
+        this.canaudio.addEventListener('change',  () => {
+            if (this.canaudio.checked && !this.room) {
+                // initialise the spatial audio
+                this.initialize();
+            } else {
+                //TODO: Stop audio
+            }
+        });
     }
 
     initialize() {
+        this.audio.push(new AudioController(this.keyboardWidth));
+        this.audio.push(new AudioController(this.keyboardWidth));
+
         this.room = new THREE.Mesh(
             new THREE.BoxBufferGeometry( 6, 6, 6, 8, 8, 8 ), this.createRoomMaterial()
         );

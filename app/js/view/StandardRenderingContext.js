@@ -1,4 +1,4 @@
-import '../../../node_modules/three/examples/js/controls/FlyControls';
+// import '../../../node_modules/three/examples/js/controls/FlyControls';
 import RenderingContext from './RenderingContext';
 import VirtualVRController from './VirtualVRController';
 
