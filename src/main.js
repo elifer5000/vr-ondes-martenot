@@ -1,6 +1,4 @@
 import {getUrlParameterByName} from './js/util';
-import 'babel-polyfill';
-import * as THREE from 'three';
 import Controller from './js/Controller';
 import RenderingContextFactory from './js/view/RenderingContextFactory';
 
