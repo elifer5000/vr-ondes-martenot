@@ -20,8 +20,8 @@
     "eslint-loader": "^1.4.0",
     "expose-loader": "0.7.1",
     "html-webpack-plugin": "^2.21.0",
-    "webpack": "^1.15.0",
-    "webpack-dev-server": "^1.16.5"
+    "webpack": "^5.83.1",
+    "webpack-dev-server": "^4.15.0"
   },
   "dependencies": {    
     "jquery": "^3.0.0",
