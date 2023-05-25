@@ -1,3 +1,5 @@
+import { Vector3 } from 'three';
+
 function BufferLoader(context, urlList, callback) {
   this.context = context;
   this.urlList = urlList;
@@ -187,7 +189,7 @@ export default class AudioController {
     initBufferLoader() {
         const bufferLoader = new BufferLoader(this.context,
             [  //List of preloaded impulse files
-            './resources/ir_rev_short.wav'
+            './ir_rev_short.wav'
             ],
             (bufferList) => {
                 const impulseResponses = [];
@@ -197,7 +199,7 @@ export default class AudioController {
                 this.convolver.buffer = impulseResponses[0];
             });
 
-      bufferLoader.load();
+        bufferLoader.load();
     }
 
     onChange(pos, gain) {
@@ -239,7 +241,7 @@ export default class AudioController {
 
         for (var note in this.notesToFreq) {
             if (this.notesToFreq.hasOwnProperty(note)) {
-                const pos = new THREE.Vector3();
+                const pos = new Vector3();
                 pos.x = this.width * (this.notesToFreq[note].step - minNote) / (maxNote - minNote) - this.width/2;
 
                 this.notesToFreq[note].position = pos;

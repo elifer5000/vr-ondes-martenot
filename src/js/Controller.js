@@ -1,6 +1,9 @@
 import MainView from './view/MainView';
 import AudioController from './AudioController';
 import {hslToRgb, lerp} from './util';
+import { Mesh, BoxGeometry, Color, MeshStandardMaterial, DoubleSide, Object3D, BufferGeometry, Vector3, Line, DataTexture, RGBAFormat, BufferAttribute } from 'three';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 
 export default class Controller {
     constructor(renderingContextFactory) {
@@ -33,24 +36,24 @@ export default class Controller {
         this.audio.push(new AudioController(this.keyboardWidth));
         this.audio.push(new AudioController(this.keyboardWidth));
 
-        this.room = new THREE.Mesh(
-            new THREE.BoxBufferGeometry( 6, 6, 6, 8, 8, 8 ), this.createRoomMaterial()
+        this.room = new Mesh(
+            new BoxGeometry( 6, 6, 6, 8, 8, 8 ), this.createRoomMaterial()
         );
         this.room.position.y = 3;
 
         this.room.receiveShadow = true;
         this.view.scene.add( this.room );
 
-        this.highlightColor = new THREE.Color(0xFFFF00);
+        this.highlightColor = new Color(0xFFFF00);
 
         for (let index = 0; index < this.view.renderingContext.controllers.length; index++) {
             const controller = this.view.renderingContext.controllers[index];
             controller.addEventListener('triggerdown', () => { this.onTriggerDown(index); });
             controller.addEventListener('menudown', () => { this.onMenuDown(index); });
         }
-        const loader = new THREE.FontLoader();
+        const loader = new FontLoader();
         this.waveGeometry = [];
-        loader.load('resources/helvetiker_regular.typeface.json', ( font ) => {
+        loader.load('helvetiker_regular.typeface.json', ( font ) => {
             this.font = font;
             console.log('font loaded');
             this.addKeysToScene();
@@ -63,8 +66,8 @@ export default class Controller {
     createRoomMaterial() {
         //this.createAudioTexture();
 
-        this.texturedMaterial = new THREE.MeshStandardMaterial( { emissive: 0xfffdfb, emissiveIntensity: 0.15, side: THREE.BackSide } )
-        const floorMaterial = new THREE.MeshStandardMaterial( { color: 0xA0A0A0, side: THREE.BackSide } );
+        this.texturedMaterial = new MeshStandardMaterial( { emissive: 0xfffdfb, emissiveIntensity: 0.15, side: DoubleSide } )
+        const floorMaterial = new MeshStandardMaterial( { color: 0xA0A0A0, side: DoubleSide } );
 
         const materials = [];
         for (let i = 0; i < 6; i++) {
@@ -75,18 +78,18 @@ export default class Controller {
             }
         }
 
-        return new THREE.MeshFaceMaterial(materials);
+        return materials;
     }
 
     createKeyGeometry(isSharp) {
-        return new THREE.BoxGeometry(isSharp ? this.keySharpWidth : this.keyWidth, this.keyHeight, this.keyLength);
+        return new BoxGeometry(isSharp ? this.keySharpWidth : this.keyWidth, this.keyHeight, this.keyLength);
     }
 
     addKeysToScene() {
         this.notes = this.audio[0].getNotesWithPosition();
-        this.rootObject = new THREE.Object3D();
-        const baseMesh = new THREE.Mesh(new THREE.BoxGeometry(1.05*this.keyboardWidth, 1.05*this.keyHeight, 1.2*this.keyLength),
-                                        new THREE.MeshStandardMaterial( { color: 0x838380 }));
+        this.rootObject = new Object3D();
+        const baseMesh = new Mesh(new BoxGeometry(1.05*this.keyboardWidth, 1.05*this.keyHeight, 1.2*this.keyLength),
+                                        new MeshStandardMaterial( { color: 0x838380 }));
 
         baseMesh.position.y -= 1.05*this.keyHeight / 2;
         baseMesh.castShadow = true;
@@ -97,20 +100,20 @@ export default class Controller {
             const isSharp = n.includes('#');
             const pos = this.notes[n].position;
             const color = isSharp ? 0x353535 : 0xfffff0;
-            const noteMesh = new THREE.Mesh(
+            const noteMesh = new Mesh(
                 this.createKeyGeometry(isSharp),
-                new THREE.MeshStandardMaterial( { color: color, wireframe: false } )
+                new MeshStandardMaterial( { color: color, wireframe: false } )
             );
             noteMesh.position.copy(pos);
             //noteMesh.rotation.y = this.audio[0].orientation;
             this.rootObject.add( noteMesh );
             this.notes[n].mesh = noteMesh;
             this.notes[n].isSharp = isSharp;
-            this.notes[n].origColor = new THREE.Color(color);
+            this.notes[n].origColor = new Color(color);
 
             if (!isSharp) {
-                const fontGeometry = new THREE.TextGeometry(n[0], {size: 0.015, height: 0.005, font: this.font});
-                const fontMesh = new THREE.Mesh(fontGeometry, new THREE.MeshStandardMaterial({color: 0x3661a5}));
+                const fontGeometry = new TextGeometry(n[0], {size: 0.015, height: 0.005, font: this.font});
+                const fontMesh = new Mesh(fontGeometry, new MeshStandardMaterial({color: 0x3661a5}));
                 fontMesh.position.copy(pos);
                 fontMesh.position.z -= this.keyLength / 2;
                 fontMesh.position.x -= 0.006;
@@ -130,7 +133,7 @@ export default class Controller {
     }
 
     moveKeys(pos, orientation) {
-        const downVec = new THREE.Vector3(0, -0.05, 0);
+        const downVec = new Vector3(0, -0.05, 0);
         downVec.applyEuler(orientation);
         this.rootObject.position.copy(pos);
         this.rootObject.position.add(downVec);
@@ -145,15 +148,23 @@ export default class Controller {
     }
 
     createWaveVisualization(index) {
-        const geo = new THREE.Geometry();
+        const geo = new BufferGeometry();
         const width =  0.5;
         const bufferLength = 1024;
         const offset = (index === 0) ? -this.keyboardWidth/3 : this.keyboardWidth/4.5;
-        for (let i = 0; i < bufferLength; i++) {
-            const vertex = new THREE.Vector3(offset + -width/2 + i*width/(bufferLength-1), 0.3, -this.keyLength / 2);
-            geo.vertices.push(vertex);
+
+        const itemSize = 3;
+        const totalSize = bufferLength * itemSize
+        const vertices = new Float32Array(totalSize);
+            
+        for (let i = 0; i < totalSize; i += itemSize) {
+            vertices[i] = offset + -width/2 + i*width/(bufferLength-1);
+            vertices[i + 1] = 0.3;
+            vertices[i + 2] = -this.keyLength / 2;
         }
-        const points = new THREE.Line(geo);
+        geo.setAttribute('position', new BufferAttribute(vertices, itemSize));
+
+        const points = new Line(geo);
 
         this.rootObject.add(points);
         this.waveGeometry.push(points);
@@ -168,7 +179,7 @@ export default class Controller {
         const halfHeight = 0.2;
         // console.log(waveform.data.length);
         for (let i = 0; i < waveform.length; i++) {
-            this.waveGeometry[index].geometry.vertices[i].y = 0.3 + halfHeight*waveform[i];
+            this.waveGeometry[index].geometry.attributes.position.setY(i, 0.3 + halfHeight*waveform[i]);
             maxv = Math.max(maxv, waveform[i]);
         }
         // console.log(maxv);
@@ -187,7 +198,7 @@ export default class Controller {
             rgba[4 * i + 3] = 255;
         }
 
-        this.audioDataTex = new THREE.DataTexture(rgba, size, size, THREE.RGBAFormat);
+        this.audioDataTex = new DataTexture(rgba, size, size, RGBAFormat);
         this.audioDataTex.needsUpdate = true;
         this.currentAudioIntensity = 0;
     }
@@ -253,7 +264,7 @@ export default class Controller {
         const pos = vrController.realPosition;
            
         let gain = 0.99;
-        const gamepad = vrController.getGamepad();
+        const gamepad = vrController.getGamepad?.();
         if (gamepad) {
             gain = 0;
             // let detuneCents = 0;
@@ -268,7 +279,7 @@ export default class Controller {
                 // console.log(gain);
                 // detuneCents = 100*gamepad.axes[0];
 
-                const newPosition = new THREE.Vector3(0.0, 0.003785, 0.049204); // Center position
+                const newPosition = new Vector3(0.0, 0.003785, 0.049204); // Center position
                 newPosition.x = -0.020221 + (0.020221 + 0.020221) * (0.5 * gamepad.axes[0] + 0.5);
                 newPosition.y = 0.002646 + (0.007248 - 0.002646) * (0.5 * gamepad.axes[1] + 0.5);
                 newPosition.z = 0.069432 + (0.029242 - 0.069432) * (0.5 * gamepad.axes[1] + 0.5);
@@ -325,16 +336,16 @@ export default class Controller {
             this.rootObject.remove(this.soundNameMeshes[index]);
         }
 
-        const fontSoundGeometry = new THREE.TextGeometry(this.audio[index].getSoundName(), {size: 0.03, height: 0.005, font: this.font});
-        const fontDelayGeometry = new THREE.TextGeometry(this.audio[index].isDelayEnabled ? 'delay on' : '', {size: 0.02, height: 0.005, font: this.font});
+        const fontSoundGeometry = new TextGeometry(this.audio[index].getSoundName(), {size: 0.03, height: 0.005, font: this.font});
+        const fontDelayGeometry = new TextGeometry(this.audio[index].isDelayEnabled ? 'delay on' : '', {size: 0.02, height: 0.005, font: this.font});
 
-        this.soundNameMeshes[index] = new THREE.Mesh(fontSoundGeometry, new THREE.MeshStandardMaterial({color: 0xb642f4}));
+        this.soundNameMeshes[index] = new Mesh(fontSoundGeometry, new MeshStandardMaterial({color: 0xb642f4}));
         this.soundNameMeshes[index].position.z = -this.keyLength / 2;
         this.soundNameMeshes[index].position.x = (index === 0) ? -this.keyboardWidth/3 : this.keyboardWidth/4.5;
         this.soundNameMeshes[index].position.y = 7*this.keyHeight;
         this.soundNameMeshes[index].rotation.x -= Math.PI / 6;
 
-        const delayMesh = new THREE.Mesh(fontDelayGeometry, new THREE.MeshStandardMaterial({color: 0xb642f4}));
+        const delayMesh = new Mesh(fontDelayGeometry, new MeshStandardMaterial({color: 0xb642f4}));
         delayMesh.position.y = -2.5*this.keyHeight;
         this.soundNameMeshes[index].add(delayMesh);
 

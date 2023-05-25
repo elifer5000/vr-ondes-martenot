@@ -22,12 +22,6 @@ export default class MainView {
             
             this.controller.onControllerMoved(e.controllers, e.head);
         });
-
-        this.render();
-    }
-
-    render() {
-        this.renderingContext.onRender(() => this.render());
     }
 
     onWindowResize() {

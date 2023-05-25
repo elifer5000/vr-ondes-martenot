@@ -1,76 +1,82 @@
-// import '../lib/WEBVR';
-// import '../../../node_modules/three/examples/js/controls/VRControls';
-// import '../../../node_modules/three/examples/js/effects/VREffect';
-// import '../../../node_modules/three/examples/js/vr/ViveController';
-// import '../../../node_modules/three/examples/js/loaders/OBJLoader';
-import * as THREE from 'three';
+import { Vector3, Euler } from 'three'
+import { VRButton } from 'three/addons/webxr/VRButton';
+import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory'
 import RenderingContext from './RenderingContext';
 
 export default class VRRenderingContext extends RenderingContext {
     initialize(container) {
         super.initialize(container);
 
-        this.controls = new THREE.VRControls(this.camera);
-        this.controls.standing = true;
-        this.effect = new THREE.VREffect( this.renderer );
+        // Add VR button
+	    document.body.appendChild(VRButton.createButton(this.renderer));
+        this.renderer.xr.enabled = true;
 
-        if (THREE.WEBVR.isAvailable() === true) {
-            document.body.appendChild( THREE.WEBVR.getButton( this.effect ) );
-        }
         this.addControllers();
     }
 
-    onRender(cb) {
-        this.effect.requestAnimationFrame(cb);
-        this.controls.update();
+    onRender() {
+        this.isVRActive = this.renderer.xr.isPresenting;
+
         const head = { position: this.getHeadsetPosition(), rotation: this.getHeadsetRotation() };
         for (let i = 0; i < this.controllers.length; i++) {
-            this.controllers[i].update();
             this.controllers[i].matrixWorld.decompose(this.controllers[i].realPosition, this.controllers[i].realRotation, this.controllers[i].realScale);
         }
         this.dispatchEvent('onControllerPositionChange', { controllers: this.controllers, head: head });
         
-        this.effect.render(this.scene, this.camera);
+        this.renderer.render(this.scene, this.camera);
     }
 
     setSize(width, height) {
-        this.effect.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setSize(width, height);
     }
 
     addControllers() {
+        const controller1 = this.renderer.xr.getController(0);
+        // controller1.addEventListener( 'selectstart', onSelectStart );
+        // controller1.addEventListener( 'selectend', onSelectEnd );
+        // controller1.addEventListener( 'squeezestart', onSqueezeStart );
+        // controller1.addEventListener( 'squeezeend', onSqueezeEnd );
+        controller1.addEventListener( 'connected', (e) => {
+            controller1.gamepad = e.data.gamepad
+        });
+        controller1.userData.id = 0;
+        this.scene.add(controller1);
+
+        const controller2 = this.renderer.xr.getController(1);
+        // controller2.addEventListener( 'selectstart', onSelectStart );
+        // controller2.addEventListener( 'selectend', onSelectEnd );
+        controller2.addEventListener( 'connected', (e) => {
+            controller2.gamepad = e.data.gamepad
+        });
+        controller2.userData.id = 1;
+        this.scene.add(controller2);
+
+        const controllerModelFactory = new XRControllerModelFactory();
+
+        const controllerGrip1 = this.renderer.xr.getControllerGrip(0);
+        controllerGrip1.add(controllerModelFactory.createControllerModel(controllerGrip1));
+        this.scene.add(controllerGrip1);
+
+        const controllerGrip2 = this.renderer.xr.getControllerGrip(1);
+        controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2));
+        this.scene.add(controllerGrip2);
+
         this.controllers = [
-            new THREE.ViveController(0),
-            new THREE.ViveController(1)
+            controller1,
+            controller2
         ];
 
         for (const controller of this.controllers) {
-            controller.realPosition = new THREE.Vector3();
-            controller.realRotation = new THREE.Euler();
-            controller.realScale = new THREE.Vector3();
-        }
-
-        const loader = new THREE.OBJLoader();
-        loader.setPath( 'models/vive-controller/' );
-        loader.load( 'vr_controller_vive_1_5.obj', (object) => {
-            const texLoader = new THREE.TextureLoader();
-            texLoader.setPath( 'models/vive-controller/' );
-            const controllerMesh = object.children[0];
-            controllerMesh.material.map = texLoader.load( 'onepointfive_texture.png' );
-            controllerMesh.material.specularMap = texLoader.load( 'onepointfive_spec.png' );
-
-            const markerOnTrackpadGeo = new THREE.SphereGeometry(0.003, 16, 16);
-            const markerOnTrackpadMesh = new THREE.Mesh(markerOnTrackpadGeo, new THREE.MeshStandardMaterial('green'));
-            markerOnTrackpadMesh.name = 'markerPad';
-            markerOnTrackpadMesh.visible = false;
-            controllerMesh.add(markerOnTrackpadMesh);
-
-            for (const controller of this.controllers) {
-                controller.add(object.clone());
-                controller.standingMatrix = this.controls.getStandingMatrix();
-                controller.markerOnPad = controller.children[0].children[0].children[0];
-                this.scene.add(controller);
+            controller.realPosition = new Vector3();
+            controller.realRotation = new Euler();
+            controller.realScale = new Vector3();
+            controller.getButtonState = (buttonIndex) => {
+                if (controller.gamepad) {
+                    // return controller.gamepad.buttons[buttonIndex].pressed;
+                }
+                return false;
             }
-        });
+        }
     }
 
     getController(index) {

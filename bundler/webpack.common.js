@@ -1,7 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCSSExtractPlugin = require('mini-css-extract-plugin');
-// const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     entry: path.resolve(__dirname, '../src/main.js'),
@@ -17,11 +17,11 @@ module.exports = {
             template: path.resolve(__dirname, '../src/index.html')
         }),
         new MiniCSSExtractPlugin(),
-        // new CopyWebpackPlugin({
-        //     patterns: [
-        //         { from: path.resolve(__dirname, '../static') }  // If static is empty this throws an error
-        //     ]
-        // })
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: path.resolve(__dirname, '../resources') }  // If resources is empty this throws an error
+            ]
+        })
     ],
     module: {
         rules: [

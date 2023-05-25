@@ -1,12 +1,13 @@
-// import '../../../node_modules/three/examples/js/controls/FlyControls';
+import { Clock, Vector3 } from 'three';
+import { FlyControls } from 'three/addons/controls/FlyControls';
 import RenderingContext from './RenderingContext';
 import VirtualVRController from './VirtualVRController';
 
 export default class StandardRenderingContext extends RenderingContext {
     initialize(container) {
         super.initialize(container);
-        this.clock = new THREE.Clock();
-        this.controls = new THREE.FlyControls(this.camera);
+        this.clock = new Clock();
+        this.controls = new FlyControls(this.camera, this.renderer.domElement);
         this.controls.movementSpeed = 1;
         this.controls.domElement = container;
         this.controls.rollSpeed = Math.PI / 24;
@@ -26,8 +27,7 @@ export default class StandardRenderingContext extends RenderingContext {
         return this.camera.rotation;
     }
 
-    onRender(cb) {
-        requestAnimationFrame(cb);
+    onRender() {
         const delta = this.clock.getDelta();
         this.controls.update(delta);
         this.renderer.render(this.scene, this.camera);
@@ -36,13 +36,13 @@ export default class StandardRenderingContext extends RenderingContext {
     }
 
     setSize(width, height) {
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setSize(width, height);
     }
 
     addControllers() {
         this.controllers = [
-            new VirtualVRController(new THREE.Vector3(0.3, 0, -1), this),
-            new VirtualVRController(new THREE.Vector3(-0.3, 0, -1), this)
+            new VirtualVRController(new Vector3(0.3, 0, -1), this),
+            new VirtualVRController(new Vector3(-0.3, 0, -1), this)
         ];
     }
 
