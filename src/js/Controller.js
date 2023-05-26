@@ -149,7 +149,7 @@ export default class Controller {
 
     createWaveVisualization(index) {
         const geo = new BufferGeometry();
-        const width =  0.5;
+        const width =  0.15;
         const bufferLength = 1024;
         const offset = (index === 0) ? -this.keyboardWidth/3 : this.keyboardWidth/4.5;
 
@@ -182,8 +182,8 @@ export default class Controller {
             this.waveGeometry[index].geometry.attributes.position.setY(i, 0.3 + halfHeight*waveform[i]);
             maxv = Math.max(maxv, waveform[i]);
         }
-        // console.log(maxv);
-        this.waveGeometry[index].geometry.verticesNeedUpdate = true;
+        // console.log(maxv);   
+        this.waveGeometry[index].geometry.attributes.position.needsUpdate = true;
     }
 
     createAudioTexture() {

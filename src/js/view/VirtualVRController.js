@@ -83,7 +83,7 @@ export default class VirtualVRController extends Observable {
 
         this.mesh.position.copy(this.renderingContext.camera.position);
         this.mesh.position.add(dir.multiplyScalar(2));
-        // this.control.update();
+        this.control.updateMatrixWorld();
         this.dispatchEvent('onPositionChange');
     }
 
