@@ -14,6 +14,7 @@ export default class StandardRenderingContext extends RenderingContext {
         this.controls.dragToLook = true;
 
         this.camera.position.set(0, 1.1, 0);
+        this.camera.updateMatrixWorld();
 
         this.addControllers();
     }
