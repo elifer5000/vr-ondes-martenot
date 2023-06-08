@@ -7,9 +7,8 @@ export default class StandardRenderingContext extends RenderingContext {
     initialize(container) {
         super.initialize(container);
         this.clock = new Clock();
-        this.controls = new FlyControls(this.camera, this.renderer.domElement);
+        this.controls = new FlyControls(this.camera, container);
         this.controls.movementSpeed = 1;
-        this.controls.domElement = container;
         this.controls.rollSpeed = Math.PI / 24;
         this.controls.autoForward = false;
         this.controls.dragToLook = true;
