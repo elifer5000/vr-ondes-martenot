@@ -17,21 +17,41 @@ export default class Controller {
         this.view = new MainView(this, renderingContextFactory);
         this.view.initialize();
 
-        this.canaudio = document.querySelector('#canaudio');
-        // Ensure the #canaudio element is not checked as some browsers
-        // Will remember it's state
-        this.canaudio.checked = false;
-        this.canaudio.addEventListener('change',  () => {
-            if (this.canaudio.checked && !this.room) {
-                // initialise the spatial audio
-                this.initialize();
-            } else {
-                //TODO: Stop audio
-            }
+        this.checkAudioPermissions();
+    }
+
+    checkAudioPermissions() {
+        // Set the source of the audio element to an empty audio file
+        let audio = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
+        audio.muted = true;
+
+        audio.play().then(() => {
+            audio.pause();
+            audio = null;
+            // allowed. Initialise the audio
+            this.initialize();
+        })
+        .catch(() => {
+            // not allowed. Need to ask for permission
+            this.canAudioContainer = document.querySelector('#canaudio-container');
+            this.canAudioContainer.style.display = 'block';
+
+            this.canaudio = document.querySelector('#canaudio');
+            this.canaudio.checked = false;
+            this.canaudio.addEventListener('change',  () => {
+                if (this.canaudio.checked && !this.room) {
+                    // initialise the spatial audio
+                    this.initialize();
+                }
+            })
         });
     }
 
     initialize() {
+        // remove #canaudio checkbox from document
+        this.canAudioContainer?.parentNode.removeChild(this.canAudioContainer);
+        this.canAudioContainer = null;
+
         this.audio.push(new AudioController(this.keyboardWidth));
         this.audio.push(new AudioController(this.keyboardWidth));
 
