@@ -83,7 +83,7 @@ export default class Controller {
     }
 
     createRoomMaterial() {
-        this.texturedMaterial = new MeshStandardMaterial( { emissive: 0xfffdfb, emissiveIntensity: 0.15, side: BackSide } )
+        this.texturedMaterial = new MeshStandardMaterial( { emissive: 0xfffdfb, emissiveIntensity: 0.01, side: BackSide } )
         const floorMaterial = new MeshStandardMaterial( { color: 0xA0A0A0, side: BackSide } );
 
         const materials = [];
