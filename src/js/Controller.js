@@ -1,7 +1,6 @@
 import MainView from './view/MainView';
 import AudioController from './AudioController';
-import {hslToRgb, lerp} from './util';
-import { Mesh, BoxGeometry, Color, MeshStandardMaterial, DoubleSide, Object3D, BufferGeometry, Vector3, Line, DataTexture, RGBAFormat, BufferAttribute } from 'three';
+import { Mesh, BoxGeometry, Color, MeshStandardMaterial, BackSide, Object3D, BufferGeometry, Vector3, Line, BufferAttribute } from 'three';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 
@@ -64,10 +63,8 @@ export default class Controller {
     }
 
     createRoomMaterial() {
-        //this.createAudioTexture();
-
-        this.texturedMaterial = new MeshStandardMaterial( { emissive: 0xfffdfb, emissiveIntensity: 0.15, side: DoubleSide } )
-        const floorMaterial = new MeshStandardMaterial( { color: 0xA0A0A0, side: DoubleSide } );
+        this.texturedMaterial = new MeshStandardMaterial( { emissive: 0xfffdfb, emissiveIntensity: 0.15, side: BackSide } )
+        const floorMaterial = new MeshStandardMaterial( { color: 0xA0A0A0, side: BackSide } );
 
         const materials = [];
         for (let i = 0; i < 6; i++) {
@@ -184,76 +181,6 @@ export default class Controller {
         }
         // console.log(maxv);   
         this.waveGeometry[index].geometry.attributes.position.needsUpdate = true;
-    }
-
-    createAudioTexture() {
-        const size = 64;
-        const rgba = new Uint8Array(size * size * 4);
-        for (var i = 0; i < size * size; i++) {
-            // RGB from 0 to 255
-            rgba[4 * i] = 0;
-            rgba[4 * i + 1] = 0;
-            rgba[4 * i + 2] = 0;
-            // OPACITY
-            rgba[4 * i + 3] = 255;
-        }
-
-        this.audioDataTex = new DataTexture(rgba, size, size, RGBAFormat);
-        this.audioDataTex.needsUpdate = true;
-        this.currentAudioIntensity = 0;
-    }
-
-
-    mapFrequenciesToColor(audio) {
-        const freqs = audio.getFrequencyData();
-        const stepSize = audio.getFrequencyStep();
-
-        const MAX_FREQ = 2500; //44100/2;
-        // 100 hz to 2100 hz
-        let freq = 0;
-        let colors = [];
-        for (let i = 0; i < freqs.length; i++) {
-            freq = i*stepSize;
-            const amp = freqs[i];
-            if (amp > 32) {
-                console.log(freq);
-                const color = hslToRgb(0.65 + freq/MAX_FREQ*0.35, 0.7 + Math.random()*0.3, 0.5);
-                colors.push(color);
-            }
-        }
-
-        return colors;
-    }
-
-    updateAudioTexture() {
-        if (!this.audioDataTex) return;
-
-        const colors1 = this.mapFrequenciesToColor(this.audio[0]);
-        const colors2 = this.mapFrequenciesToColor(this.audio[1]);
-        const colors = colors1.concat(colors2);
-
-        const size = 64;
-        const rgba = this.audioDataTex.image.data;
-        for (let i = 0; i < size * size; i++) {
-            let color = [0, 0, 0];
-
-            if (colors.length > 0) {
-                const randIndex = Math.floor((colors.length - 1) * Math.random());
-                color = colors[randIndex];
-            }
-            // RGB from 0 to 255
-            rgba[4 * i] = lerp(rgba[4 * i], color[0], 0.05);
-            rgba[4 * i + 1] = lerp(rgba[4 * i + 1], color[1], 0.05);
-            rgba[4 * i + 2] = lerp(rgba[4 * i + 2], color[2], 0.05);
-            // OPACITY
-            // rgba[4 * i + 3] = 255;
-        }
-        // Get average volume
-
-        const volume = Math.max(this.audio[0].getVolume(), this.audio[1].getVolume());
-        this.currentAudioIntensity = lerp(this.currentAudioIntensity, volume, 0.05); //this.currentAudioIntensity + 0.05*(volume - this.currentAudioIntensity);
-        this.view.renderingContext.hemiLight.intensity = Math.max(0.15, 3*this.currentAudioIntensity);
-        this.audioDataTex.needsUpdate = true;
     }
 
     changeAudioFromController(vrController, audio) {
@@ -374,6 +301,5 @@ export default class Controller {
             this.changeAudioFromController(controllers[i], this.audio[i]);
             this.updateWaveVisualization(i);
         }
-        // this.updateAudioTexture();
     }
 }
