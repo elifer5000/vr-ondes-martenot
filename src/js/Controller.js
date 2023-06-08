@@ -1,6 +1,6 @@
 import MainView from './view/MainView';
 import AudioController from './AudioController';
-import { Mesh, BoxGeometry, Color, MeshStandardMaterial, BackSide, Object3D, BufferGeometry, Vector3, Line, BufferAttribute } from 'three';
+import { Mesh, BoxGeometry, Color, MeshStandardMaterial, BackSide, Object3D, BufferGeometry, Vector3, Line, LineBasicMaterial, BufferAttribute } from 'three';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 
@@ -181,7 +181,8 @@ export default class Controller {
         }
         geo.setAttribute('position', new BufferAttribute(vertices, itemSize));
 
-        const points = new Line(geo);
+        const material = new LineBasicMaterial({ color: Math.random() * 0xffffff });
+        const points = new Line(geo, material);
 
         this.rootObject.add(points);
         this.waveGeometry.push(points);
