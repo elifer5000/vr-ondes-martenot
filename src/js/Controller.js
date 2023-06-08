@@ -168,7 +168,7 @@ export default class Controller {
         const geo = new BufferGeometry();
         const width =  0.15;
         const bufferLength = 1024;
-        const offset = (index === 0) ? -this.keyboardWidth/3 : this.keyboardWidth/4.5;
+        const offset = (index === 0) ? this.keyboardWidth/6 : -this.keyboardWidth/2.5;
 
         const itemSize = 3;
         const totalSize = bufferLength * itemSize
@@ -289,7 +289,7 @@ export default class Controller {
 
         this.soundNameMeshes[index] = new Mesh(fontSoundGeometry, new MeshStandardMaterial({color: 0xb642f4}));
         this.soundNameMeshes[index].position.z = -this.keyLength / 2;
-        this.soundNameMeshes[index].position.x = (index === 0) ? -this.keyboardWidth/3 : this.keyboardWidth/4.5;
+        this.soundNameMeshes[index].position.x = (index === 0) ? this.keyboardWidth/4 : -this.keyboardWidth/4;
         this.soundNameMeshes[index].position.y = 7*this.keyHeight;
         this.soundNameMeshes[index].rotation.x -= Math.PI / 6;
 
