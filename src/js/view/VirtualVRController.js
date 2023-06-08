@@ -21,6 +21,12 @@ export default class VirtualVRController extends Observable {
         this.renderingContext.scene.add(this.mesh);
         this.renderingContext.scene.add(this.control);
 
+        this.control.addEventListener('mouseDown', () => {
+            this.renderingContext.flyControlsEnabled = false;
+        });
+        this.control.addEventListener('mouseUp', () => {
+            this.renderingContext.flyControlsEnabled = true;
+        });
         this.control.addEventListener( 'objectChange', () => {
             this.dispatchEvent('onPositionChange');
         });

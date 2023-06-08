@@ -7,11 +7,12 @@ export default class StandardRenderingContext extends RenderingContext {
     initialize(container) {
         super.initialize(container);
         this.clock = new Clock();
-        this.controls = new FlyControls(this.camera, container);
-        this.controls.movementSpeed = 1;
-        this.controls.rollSpeed = Math.PI / 24;
-        this.controls.autoForward = false;
-        this.controls.dragToLook = true;
+        this.flyControls = new FlyControls(this.camera, container);
+        this.flyControls.movementSpeed = 1;
+        this.flyControls.rollSpeed = Math.PI / 24;
+        this.flyControls.autoForward = false;
+        this.flyControls.dragToLook = true;
+        this.flyControlsEnabled = true;
 
         this.camera.position.set(0, 1.1, 0);
         this.camera.updateMatrixWorld();
@@ -29,7 +30,9 @@ export default class StandardRenderingContext extends RenderingContext {
 
     onRender() {
         const delta = this.clock.getDelta();
-        this.controls.update(delta);
+        if (this.flyControlsEnabled) {
+            this.flyControls.update(delta);
+        }
         this.renderer.render(this.scene, this.camera);
         const head = { position: this.getHeadsetPosition(), rotation: this.getHeadsetRotation() };
         this.dispatchEvent('onControllerPositionChange', { controllers: this.controllers, head: head });
