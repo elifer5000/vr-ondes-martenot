@@ -205,42 +205,20 @@ export default class Controller {
         this.waveGeometry[index].geometry.attributes.position.needsUpdate = true;
     }
 
-    changeAudioFromController(vrController, audio) {
+    changeAudioFromController(vrController, audio, gain) {
         if (!this.rootObject) {
             return;
         }
 
         const pos = vrController.realPosition;
            
-        let gain = 0.99;
-        const gamepad = vrController.getGamepad?.();
-        if (gamepad) {
-            gain = 0;
-            // let detuneCents = 0;
-            const markerOnPad = vrController.markerOnPad;
-            if (gamepad.buttons[0].touched) {
-                // gain = Math.log10(1 + 9 * (gamepad.axes[1] + 1) / 2);
-                // Let's try the opposite of log, x^4
-                // Axes are in the [-1, 1] range
-                //const gainNormalized = (Math.max(-0.5, gamepad.axes[1]) + 0.5) / 1.5; // Normalizes to the [0, 1] range, leaving the bottom 1/4th of the pad unused (=0)
-                const gainNormalized = 0.5*gamepad.axes[1] + 0.5; // Normalize to the [0, 1] range
-                gain = gainNormalized * gainNormalized * gainNormalized;
-                // console.log(gain);
-                // detuneCents = 100*gamepad.axes[0];
-
-                const newPosition = new Vector3(0.0, 0.003785, 0.049204); // Center position
-                newPosition.x = -0.020221 + (0.020221 + 0.020221) * (0.5 * gamepad.axes[0] + 0.5);
-                newPosition.y = 0.002646 + (0.007248 - 0.002646) * (0.5 * gamepad.axes[1] + 0.5);
-                newPosition.z = 0.069432 + (0.029242 - 0.069432) * (0.5 * gamepad.axes[1] + 0.5);
-
-                markerOnPad.position.copy(newPosition);
-                markerOnPad.visible = true;
-            } else {
-                markerOnPad.visible = false;
-            }
-            // audio.detune(detuneCents);
-        }
-
+        // let detuneCents = 0;
+        // Let's try the opposite of log, x^3
+        const gainNormalized = gain * gain * gain;
+        // console.log(gain);
+        // detuneCents = 100*gamepad.axes[0];
+        // audio.detune(detuneCents);
+    
         const posLocal = pos.clone();
         this.rootObject.worldToLocal(posLocal);
         // check is inside space if not, gain 0
@@ -257,22 +235,18 @@ export default class Controller {
             if (Math.abs(posLocal.x - note.position.x) < 0.0065) {
                 note.mesh.material.color = this.highlightColor;
 
-                if (gamepad && vrController.lastNote !== note) {
-                    if (gamepad.haptics) { // Old version. Deprecated
-                        gamepad.haptics[0].vibrate(0.25, 25);
-                    } else if (gamepad.hapticActuators) {
-                        gamepad.hapticActuators[0].pulse(0.25, 25);
-                    }
+                if (vrController.lastNote !== note) {
+                    vrController.pulse(0.25, 25);
                 }
                 currentNote = note;
                 break;
             }
         }
         if (currentNote) {
-            audio.onChange(currentNote.position.x, gain);   
+            audio.onChange(currentNote.position.x, gainNormalized);   
         }
         else {
-            audio.onChange(posLocal.x, gain);    
+            audio.onChange(posLocal.x, gainNormalized);    
         }            
 
         vrController.lastNote = currentNote;
@@ -316,11 +290,12 @@ export default class Controller {
     onControllerMoved(controllers, head) {
         this.resetHighlights();
         for (let i = 0; i < controllers.length; i++) {
-            if (controllers[i].getButtonState(VR_BUTTONS.GRIP)) {
+            if (controllers[i].getButtonPressedState(VR_BUTTONS.GRIP)) {
                 this.moveKeys(controllers[i].realPosition, controllers[i].realRotation);
             }
 
-            this.changeAudioFromController(controllers[i], this.audio[i]);
+            const triggerValue = controllers[i].getButtonValue(VR_BUTTONS.TRIGGER)
+            this.changeAudioFromController(controllers[i], this.audio[i], triggerValue);
             this.updateWaveVisualization(i);
         }
     }

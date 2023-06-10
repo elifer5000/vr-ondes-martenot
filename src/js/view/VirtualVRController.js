@@ -108,13 +108,17 @@ export default class VirtualVRController extends Observable {
         return this.mesh.rotation;
     }
 
-    getButtonState(button) {
+    getButtonPressedState(button) {
         if (button === VR_BUTTONS.GRIP) return this.gripsArePressed;
         if (button === VR_BUTTONS.TRIGGER) return this.triggerIsPressed;
         if (button === VR_BUTTONS.B_OR_Y) return this.menuIsPressed;
     }
 
-    getGamepad() {
-        return null;
+    getButtonValue(button) {
+        if (button === VR_BUTTONS.TRIGGER) return 1;
+        
+        return 0;
     }
+
+    pulse() {}
 }

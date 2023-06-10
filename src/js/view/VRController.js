@@ -3,10 +3,10 @@ import Observable from '../Observable';
 import { VR_BUTTONS } from './Common';
 
 const CONTROLLER_EVENTS = [
-    'selectstart',
+    'selectstart', // Select is the same as trigger
     'selectend',
     'select',
-    'squeezestart',
+    'squeezestart', // Squeeze is the same as grip
     'squeezeend',
     'squeeze',
 ];
@@ -21,54 +21,26 @@ export class VRController extends Observable {
 
         this.controller = renderer.xr.getController(index);
         this.controller.addEventListener('connected', (e) => {
-            this.controller.gamepad = e.data.gamepad
+            const gamepad = e.data.gamepad;
+            this.controller.gamepad = gamepad;
+            this.supportHaptic = 'hapticActuators' in gamepad && gamepad.hapticActuators != null && gamepad.hapticActuators.length > 0;
         });
         this.controller.addEventListener('disconnected', (e) => {
             this.controller.gamepad = null;
+            this.supportHaptic = false;
         });
         this.controller.userData.id = index;
 
 
         this.controllerGrip = renderer.xr.getControllerGrip(index);
         this.controllerGrip.add(controllerModelFactory.createControllerModel(this.controllerGrip));
-        
-        // this.controller.addEventListener('selectstart', this.onSelectStart.bind(this));
-        // this.controller.addEventListener('select', this.onSelect.bind(this));
-        // this.controller.addEventListener('selectend', this.onSelectEnd.bind(this));
-        // this.controller.addEventListener('squeezestart', this.onSqueezeStart.bind(this));
-        // this.controller.addEventListener('squeeze', this.onSqueeze.bind(this));
-        // this.controller.addEventListener('squeezeend', this.onSqueezeEnd.bind(this));
-        
+         
         this.buttonsState = {};
         this.buttonsKeys = Object.keys(VR_BUTTONS);
         this.buttonsKeys.forEach(key => {
             this.buttonsState[key] = false;
         });
     }
-
-    // onSelectStart(e) {
-    //     console.log('onSelectStart', e);
-    // }
-
-    // onSelect(e) {
-    //     console.log('onSelect', e);
-    // }
-
-    // onSelectEnd(e) {
-    //     console.log('onSelectEnd', e);
-    // }
-
-    // onSqueezeStart(e) {
-    //     console.log('onSqueezeStart', e);
-    // }
-
-    // onSqueeze(e) {
-    //     console.log('onSqueeze', e);
-    // }
-
-    // onSqueezeEnd(e) {
-    //     console.log('onSqueezeEnd', e);
-    // }
 
     get matrixWorld() {
         return this.controller.matrixWorld;
@@ -102,11 +74,27 @@ export class VRController extends Observable {
         });
     }
 
-    getButtonState(buttonIndex) {
+    getButtonPressedState(buttonIndex) {
         if (this.controller.gamepad) {
             return this.controller.gamepad.buttons[buttonIndex].pressed;
         }
 
         return false;
+    }
+
+    getButtonValue(buttonIndex) {
+        if (this.controller.gamepad) {
+            return this.controller.gamepad.buttons[buttonIndex].value;
+        }
+
+        return 0;
+    }
+
+    pulse(duration, value) {
+        if (!this.supportHaptic) {
+            return;
+        }
+
+        this.controller.gamepad.hapticActuators[0].pulse(duration, value);
     }
 }
