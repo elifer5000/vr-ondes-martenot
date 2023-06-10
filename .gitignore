@@ -61,7 +61,6 @@ crashlytics-build.properties
 
 
 # Node dependencies
-dist/*
 node_modules/*
 
 # SSL
