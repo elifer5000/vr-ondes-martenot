@@ -68,8 +68,8 @@ export default class Controller {
 
         for (let index = 0; index < this.view.renderingContext.controllers.length; index++) {
             const controller = this.view.renderingContext.controllers[index];
-            controller.addEventListener('triggerdown', () => { this.onTriggerDown(index); });
-            controller.addEventListener('menudown', () => { this.onMenuDown(index); });
+            controller.addEventListener('A_OR_X' + 'start', () => { this.onSelectStart(index); });
+            controller.addEventListener('B_OR_Y' + 'start', () => { this.onBorY(index); });
         }
         const loader = new FontLoader();
         this.waveGeometry = [];
@@ -303,12 +303,12 @@ export default class Controller {
     }
 
 
-    onTriggerDown(index) {
+    onSelectStart(index) {
         this.audio[index].selectNextSound();
         this.updateSoundName(index);
     }
 
-    onMenuDown(index) {
+    onBorY(index) {
         this.audio[index].toggleDelay();
         this.updateSoundName(index);
     }

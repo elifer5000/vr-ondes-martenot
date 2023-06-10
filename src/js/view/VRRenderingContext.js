@@ -21,6 +21,7 @@ export default class VRRenderingContext extends RenderingContext {
         const head = { position: this.getHeadsetPosition(), rotation: this.getHeadsetRotation() };
         for (let i = 0; i < this.controllers.length; i++) {
             this.controllers[i].matrixWorld.decompose(this.controllers[i].realPosition, this.controllers[i].realRotation, this.controllers[i].realScale);
+            this.controllers[i].update();
         }
         this.dispatchEvent('onControllerPositionChange', { controllers: this.controllers, head: head });
         
