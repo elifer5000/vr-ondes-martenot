@@ -56,11 +56,11 @@ export default class VirtualVRController extends Observable {
                 break;
             case 53: // 5
                 this.triggerIsPressed = true;
-                this.dispatchEvent('triggerdown');
+                this.dispatchEvent('A_OR_X' + 'start');
                 break;
             case 54: // 6
                 this.menuIsPressed = true;
-                this.dispatchEvent('menudown');
+                this.dispatchEvent('B_OR_Y' + 'start');
                 break;
         }
     }
@@ -72,11 +72,11 @@ export default class VirtualVRController extends Observable {
                 break;
             case 53: // 5
                 this.triggerIsPressed = false;
-                this.dispatchEvent('triggerup');
+                this.dispatchEvent('A_OR_X' + 'end');
                 break;
             case 54: // 6
                 this.menuIsPressed = false;
-                this.dispatchEvent('menuup');
+                this.dispatchEvent('B_OR_Y' + 'end');
                 break;
         }
     }
