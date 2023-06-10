@@ -1,6 +1,7 @@
 import { TransformControls } from 'three/addons/controls/TransformControls';
 import { Mesh, MeshStandardMaterial, SphereGeometry } from 'three';
 import Observable from '../Observable';
+import { VR_BUTTONS } from './Common';
 
 export default class VirtualVRController extends Observable {
     constructor(cameraOffset, renderingContext) {
@@ -46,7 +47,6 @@ export default class VirtualVRController extends Observable {
         switch (e.keyCode) {
             case 32: // space
                 this.gripsArePressed = true;
-                this.dispatchEvent('gripsdown');
                 break;
             case 49: // 1
                 this.control.setMode('translate');
@@ -69,7 +69,6 @@ export default class VirtualVRController extends Observable {
         switch (e.keyCode) {
             case 32: // space
                 this.gripsArePressed = false;
-                this.dispatchEvent('gripsup');
                 break;
             case 53: // 5
                 this.triggerIsPressed = false;
@@ -110,9 +109,9 @@ export default class VirtualVRController extends Observable {
     }
 
     getButtonState(button) {
-        if (button === 'grips') return this.gripsArePressed;
-        if (button === 'trigger') return this.triggerIsPressed;
-        if (button === 'menu') return this.menuIsPressed;
+        if (button === VR_BUTTONS.GRIP) return this.gripsArePressed;
+        if (button === VR_BUTTONS.TRIGGER) return this.triggerIsPressed;
+        if (button === VR_BUTTONS.B_OR_Y) return this.menuIsPressed;
     }
 
     getGamepad() {

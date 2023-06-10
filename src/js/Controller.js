@@ -3,6 +3,7 @@ import AudioController from './AudioController';
 import { Mesh, BoxGeometry, Color, MeshStandardMaterial, BackSide, Object3D, BufferGeometry, Vector3, Line, LineBasicMaterial, BufferAttribute } from 'three';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
+import { VR_BUTTONS } from './view/Common';
 
 export default class Controller {
     constructor(renderingContextFactory) {
@@ -40,7 +41,7 @@ export default class Controller {
             this.canaudio.checked = false;
             this.canaudio.addEventListener('change',  () => {
                 if (this.canaudio.checked && !this.room) {
-                    // initialise the spatial audio
+                    // initialise the audio
                     this.initialize();
                 }
             })
@@ -315,7 +316,7 @@ export default class Controller {
     onControllerMoved(controllers, head) {
         this.resetHighlights();
         for (let i = 0; i < controllers.length; i++) {
-            if (controllers[i].getButtonState('grips')) {
+            if (controllers[i].getButtonState(VR_BUTTONS.GRIP)) {
                 this.moveKeys(controllers[i].realPosition, controllers[i].realRotation);
             }
 
