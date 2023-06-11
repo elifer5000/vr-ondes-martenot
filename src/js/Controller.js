@@ -68,7 +68,7 @@ export default class Controller {
 
         for (let index = 0; index < this.view.renderingContext.controllers.length; index++) {
             const controller = this.view.renderingContext.controllers[index];
-            controller.addEventListener('A_OR_X' + 'start', () => { this.onSelectStart(index); });
+            controller.addEventListener('A_OR_X' + 'start', () => { this.onAorX(index); });
             controller.addEventListener('B_OR_Y' + 'start', () => { this.onBorY(index); });
         }
         const loader = new FontLoader();
@@ -276,13 +276,14 @@ export default class Controller {
         this.rootObject.add(this.soundNameMeshes[index] );
     }
 
-
-    onSelectStart(index) {
+    onAorX(index) {
+        // Change instrument
         this.audio[index].selectNextSound();
         this.updateSoundName(index);
     }
 
     onBorY(index) {
+        // Toggle delay
         this.audio[index].toggleDelay();
         this.updateSoundName(index);
     }
