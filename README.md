@@ -41,7 +41,7 @@ npm run server
 It should open a tab to https://<your-ip>:8080
 ### Controls
 * Each control can be used as an independent instrument.
-* Use the grip button to position the keys wherever you desire. It is recommended to put it on top of a real table, that way it can be used as a pivot point and better vibrato can be achieved.
+* Use the thumbstick button to position the keys wherever you desire. It is recommended to put it on top of a real table, that way it can be used as a pivot point and better vibrato can be achieved.
 * Use trigger for volume control. No sound is produced until the trigger is pressed.
 * Use the A and X buttons to cycle through the different sounds (Sine, Trapezium, Violin, Square, Triangle, Sawtooth)
 * Use the B and Y buttons to turn delay on/off.
