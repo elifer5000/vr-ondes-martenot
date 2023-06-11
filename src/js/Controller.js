@@ -291,7 +291,7 @@ export default class Controller {
     onControllerChange(controllers, head) {
         this.resetHighlights();
         for (let i = 0; i < controllers.length; i++) {
-            if (controllers[i].getButtonPressedState(VR_BUTTONS.GRIP)) {
+            if (controllers[i].getButtonPressedState(VR_BUTTONS.HUD_BUTTON)) {
                 this.moveKeys(controllers[i].realPosition, controllers[i].realRotation);
             }
 

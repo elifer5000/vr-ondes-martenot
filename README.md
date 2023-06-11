@@ -56,5 +56,5 @@ http://localhost:8080/?mode=emu
 This creates two virtual controllers you can move around in the scene to simulate the actual controllers. You can then use these controls:
 * Press 1 and 2 to change to move/rotate respectively.
 * Press 5 to cycle through the sounds.
-* Press 6 to turn delay on/off
-* Press spacebar for grip (i.e. position the keys under the control)
+* Press 6 to turn delay on/off.
+* Press spacebar for positioning the keys under the control.

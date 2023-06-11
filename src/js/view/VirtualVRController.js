@@ -34,7 +34,7 @@ export default class VirtualVRController extends Observable {
 
         this.thumbpadIsPressed = false;
         this.triggerIsPressed = false;
-        this.gripsArePressed = false;
+        this.hudIsPressed = false;
         this.menuIsPressed = false;
 
         window.addEventListener('keydown', (e) => this.onKeydown(e));
@@ -46,7 +46,7 @@ export default class VirtualVRController extends Observable {
     onKeydown(e) {
         switch (e.keyCode) {
             case 32: // space
-                this.gripsArePressed = true;
+                this.hudIsPressed = true;
                 break;
             case 49: // 1
                 this.control.setMode('translate');
@@ -68,7 +68,7 @@ export default class VirtualVRController extends Observable {
     onKeyup(e) {
         switch (e.keyCode) {
             case 32: // space
-                this.gripsArePressed = false;
+                this.hudIsPressed = false;
                 break;
             case 53: // 5
                 this.triggerIsPressed = false;
@@ -109,7 +109,7 @@ export default class VirtualVRController extends Observable {
     }
 
     getButtonPressedState(button) {
-        if (button === VR_BUTTONS.GRIP) return this.gripsArePressed;
+        if (button === VR_BUTTONS.HUD_BUTTON) return this.hudIsPressed;
         if (button === VR_BUTTONS.TRIGGER) return this.triggerIsPressed;
         if (button === VR_BUTTONS.B_OR_Y) return this.menuIsPressed;
     }
