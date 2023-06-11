@@ -287,7 +287,7 @@ export default class Controller {
         this.updateSoundName(index);
     }
 
-    onControllerMoved(controllers, head) {
+    onControllerChange(controllers, head) {
         this.resetHighlights();
         for (let i = 0; i < controllers.length; i++) {
             if (controllers[i].getButtonPressedState(VR_BUTTONS.GRIP)) {

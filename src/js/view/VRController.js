@@ -56,6 +56,8 @@ export class VRController extends Observable {
     }
 
     update() {
+        this.matrixWorld.decompose(this.realPosition, this.realRotation, this.realScale);
+
         if (!this.controller.gamepad) {
             return;
         }
