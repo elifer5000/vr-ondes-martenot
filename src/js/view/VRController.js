@@ -24,10 +24,14 @@ export class VRController extends Observable {
             const gamepad = e.data.gamepad;
             this.controller.gamepad = gamepad;
             this.supportHaptic = 'hapticActuators' in gamepad && gamepad.hapticActuators != null && gamepad.hapticActuators.length > 0;
+
+            const session = this.renderer.xr.getSession();
+            this.isRightHand = session.inputSources[this.index].handedness === 'right';
         });
         this.controller.addEventListener('disconnected', (e) => {
             this.controller.gamepad = null;
             this.supportHaptic = false;
+            this.isRightHand = undefined;
         });
         this.controller.userData.id = index;
 
@@ -98,5 +102,10 @@ export class VRController extends Observable {
         }
 
         this.controller.gamepad.hapticActuators[0].pulse(duration, value);
+    }
+
+    isRightHanded() {
+        // If undefined, assume right hand according to index
+        return this.isRightHand ?? this.index === 0;
     }
 }

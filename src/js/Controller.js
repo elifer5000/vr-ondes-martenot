@@ -80,7 +80,10 @@ export default class Controller {
             this.createWaveVisualization(0);
             this.createWaveVisualization(1);
         });
+    }
 
+    isControllerRightHanded(index) {
+        return this.view.renderingContext.controllers[index].isRightHanded();
     }
 
     createRoomMaterial() {
@@ -169,14 +172,13 @@ export default class Controller {
         const geo = new BufferGeometry();
         const width =  0.15;
         const bufferLength = 1024;
-        const offset = (index === 0) ? this.keyboardWidth/6 : -this.keyboardWidth/2.5;
-
+        
         const itemSize = 3;
         const totalSize = bufferLength * itemSize
         const vertices = new Float32Array(totalSize);
             
         for (let i = 0; i < totalSize; i += itemSize) {
-            vertices[i] = offset + -width/2 + i*width/(bufferLength-1);
+            vertices[i] = -width/2 + i*width/(bufferLength-1);
             vertices[i + 1] = 0.3;
             vertices[i + 2] = -this.keyLength / 2;
         }
@@ -197,6 +199,8 @@ export default class Controller {
         let maxv = 0;
         const halfHeight = 0.2;
         // console.log(waveform.data.length);
+        const offset = this.isControllerRightHanded(index) ? this.keyboardWidth/6 : -this.keyboardWidth/2.5;
+        this.waveGeometry[index].position.x = offset;
         for (let i = 0; i < waveform.length; i++) {
             this.waveGeometry[index].geometry.attributes.position.setY(i, 0.3 + halfHeight*waveform[i]);
             maxv = Math.max(maxv, waveform[i]);
@@ -264,7 +268,7 @@ export default class Controller {
 
         this.soundNameMeshes[index] = new Mesh(fontSoundGeometry, new MeshStandardMaterial({color: 0xb642f4}));
         this.soundNameMeshes[index].position.z = -this.keyLength / 2;
-        this.soundNameMeshes[index].position.x = (index === 0) ? this.keyboardWidth/4 : -this.keyboardWidth/4;
+        this.soundNameMeshes[index].position.x = this.isControllerRightHanded(index) ? this.keyboardWidth/4 : -this.keyboardWidth/4;
         this.soundNameMeshes[index].position.y = 7*this.keyHeight;
         this.soundNameMeshes[index].rotation.x -= Math.PI / 6;
 
