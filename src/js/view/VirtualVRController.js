@@ -109,7 +109,7 @@ export default class VirtualVRController extends Observable {
     }
 
     getButtonPressedState(button) {
-        if (button === VR_BUTTONS.HUD_BUTTON) return this.hudIsPressed;
+        if (button === VR_BUTTONS.THUMBSTICK_BUTTON) return this.hudIsPressed;
         if (button === VR_BUTTONS.TRIGGER) return this.triggerIsPressed;
         if (button === VR_BUTTONS.B_OR_Y) return this.menuIsPressed;
     }
